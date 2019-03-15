@@ -69,26 +69,11 @@ module.exports = {
       let populate = '';
       if(options.populate && options.populate !== 'false') {
         populate = options.populate;
-        // await Functions.asyncForEach(Object.keys(model.schema.obj), async (key) => {
-        //   var val = Array.isArray(model.schema.obj[key]) ? model.schema.obj[key][0] : model.schema.obj[key];
-
-        //   if (typeof val === 'object' && val && val.ref) {
-
-        //     console.log()
-            
-        //     populate += ` ${val.ref.toLowerCase()}`
-        
-        //   }
-        // });
         
         delete options.populate;
-
-       
-        
       }
    
       var popArr = await populationDeep(options, populate);
-
 
       if (!options.sort) options.sort = 'createdAt'
       if (!options.direction) options.direction = 'asc'
@@ -97,9 +82,6 @@ module.exports = {
 
       if (!options.query && !options.secondary && !options || !options.query && !options.secondary && Object.keys(options).length === 0) options.query = {};
       if (!options.type) options.type = 'find';
-
-
-      
 
       if (options.or) {
 
@@ -117,14 +99,8 @@ module.exports = {
             let modelName = runFunction.schema.paths[newValue[0]].options.ref;
 
             let search = mongoose.models[modelName].schema.paths[newValue[1]];
-            console.log({query:{[newValue[1]]:options.query[value]}});
+      
             mongoose.models[modelName].m_read({query:{[newValue[1]]:options.query[value]}, or:'t'}).catch(e => console.log(e));
-
-            //console.log(users);
-
-           // console.log(search);
-
-
 
           }
           if (runFunction.schema.paths[value] && runFunction.schema.paths[value].instance === 'Number') {
@@ -156,7 +132,7 @@ module.exports = {
           }
 
           if (!noRun) {
-            let regEx = new RegExp(options.query[value], 'g')
+            let regEx = new RegExp(options.query[value], 'gi');
 
             if (value !== 'updatedAt')
               or.$or.push({

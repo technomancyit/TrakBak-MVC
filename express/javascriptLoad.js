@@ -43,6 +43,8 @@ async function awaitArray() {
 
         if(file === '6-dataTables-responsive.js') setAdmin();
 
+        if(file === 'moment.js') setAdmin();
+
         if(file === 'letterAvatars.js') setAdmin();
 
         let filePath = `${dir}/js/${file}`,

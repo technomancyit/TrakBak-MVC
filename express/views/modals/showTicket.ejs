@@ -75,7 +75,7 @@
                                       <p class="last-message text-muted">{{obj.text}}</p>
                                     </div>
                                     <div class="chat-footer">
-                                      <p class="text-smaller text-muted mb-0">{{obj.updatedAt}}</p>
+                                      <p class="text-smaller text-muted mb-0">{{moment(obj.updatedAt).fromNow()}}</p>
                                       <span class="text-muted float-right"><i class="fas fa-mail-reply" aria-hidden="true"></i></span>
                                     </div>
                                   </a>
@@ -97,7 +97,7 @@
                                   <div class="chat-body white p-3 ml-2 z-depth-1">
                                     <div class="header">
                                       <strong class="primary-font">{{obj.sender.account}}</strong>
-                                      <small class="pull-right text-muted"><i class="far fa-clock"></i> {{obj.updatedAt}}</small>
+                                      <small class="pull-right text-muted"><i class="far fa-clock"></i> {{moment(obj.updatedAt).fromNow()}}</small>
                                     </div>
                                     <hr class="w-100">
                                     <p class="mb-0">
