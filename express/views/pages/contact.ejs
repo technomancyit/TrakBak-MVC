@@ -1,0 +1,58 @@
+<!-- Contact-->
+<div class="collapse container container-fill" id="contact">
+  <div class="card card-body bg-danger text-white py-5 card-square">
+    <h2>
+      <%- contact.title %>
+    </h2>
+    <p class="lead">
+      <%- contact.paragraph %>
+    </p>
+  </div>
+  <div class="card card-body py-5">
+    <h3>
+      <%- contact.contactTitle %>
+    </h3>
+    <p>
+      <%- contact.contactParagraph %>
+    </p>
+    <%if (contact.contactForm.fields.length > 0) { %>
+    <form id="<%- contact.contactForm.id %>">
+      <% for(var i=0; i < contact.contactForm.fields.length; i++) { %>
+      <div class="form-group">
+        <div class="input-group input-group-lg">
+          <div class="input-group-prepend">
+            <span class="input-group-text bg-danger text-white">
+              <i class="fas fa-<%- contact.contactForm.fields[i].icon %>"></i>
+            </span>
+          </div>
+          <%if (contact.contactForm.fields[i].type !== "textarea") { %>
+          <input id="<%- contact.contactForm.fields[i].id %>" name="<%- contact.contactForm.fields[i].name %>" type="<%- contact.contactForm.fields[i].type %>"
+            class="form-control bg-dark text-white" placeholder="<%- contact.contactForm.fields[i].field %>">
+          <% } %>
+          <%if (contact.contactForm.fields[i].type === "textarea") { %>
+          <textarea id="<%- contact.contactForm.fields[i].id %>" name="<%- contact.contactForm.fields[i].name %>" class="form-control bg-dark text-white"
+            placeholder="<%- contact.contactForm.fields[i].field %>"></textarea>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+        <%if (contact.contactForm.recaptcha) { %>
+        <div class="text-right">
+          <input  :style="forms.sendEmail.recaptcha.on" data-expired-callback="recaptchaCallbackDisconnect" type="submit" @click="sendEmail" value="<%- contact.contactForm.submitButtonText %>"
+            class="btn btn-primary btn-block btn-lg">
+
+          <div :style="forms.sendEmail.recaptcha.off" data-callback="recaptchaCallback" data-expired-callback="recaptchaCallbackDisconnect"
+            class="g-recaptcha" data-sitekey="<%- contact.contactForm.recaptchSiteKey %>"></div><br>
+          </div>
+        
+        <% } %>
+        <%if (!contact.contactForm.recaptcha) { %>
+        <div class="text-right">
+          <input type="submit" @click="sendEmail" value="<%- contact.contactForm.submitButtonText %>" class="btn btn-primary btn-block btn-lg">
+        </div>
+        <% } %>
+ 
+    </form>
+    <% } %>
+  </div>
+</div>
