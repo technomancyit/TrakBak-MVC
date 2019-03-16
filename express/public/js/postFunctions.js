@@ -71,6 +71,7 @@ function postApi(url, data, type) {
                 if (type === 'login') {
                     userApp.mgSync = data;
                     userHead.mgSync = data;
+                    
                     setCookie('jwt', data.token, 1);
                     $('#userModal').modal('hide');
                     window.history.replaceState({}, document.title, "/" + "");

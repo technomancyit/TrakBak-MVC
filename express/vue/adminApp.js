@@ -7,6 +7,11 @@ var adminApp = new Vue({
     },
     methods: {
     },
+    mounted: function () {
+      this.$nextTick(function () {
+        getApi('/api/me', 'me');
+      })
+    },
     
     end: {
       

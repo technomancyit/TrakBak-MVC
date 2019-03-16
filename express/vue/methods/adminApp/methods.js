@@ -124,17 +124,17 @@ object = {
 
         getApi(`/api/tickets?page=${page}&perPage=${perPage}&count=true`, 'table')
     },
-    handler: (e) => {
+    handler: (event) => {
 
         //do stuff
-        let id = $(e.target).parent()[0].id;
+        let id = $(event.target).parent()[0].id;
 
         adminApp.clickMenu.forEach((menu, index) => {
             adminApp.clickMenu[index].id = id;
         });
         adminApp.openedMenu = true;
-        var top = e.pageY - 10;
-        var left = e.pageX - 90;
+        var top = event.pageY - 10;
+        var left = event.pageX - 90;
         $("#context-menu").css({
             display: "block",
             top: top,
@@ -144,7 +144,7 @@ object = {
         })
 
 
-        e.preventDefault();
+        event.preventDefault();
     },
     checkMenu: () => {
         if (adminApp.openedMenu) {
@@ -221,6 +221,38 @@ object = {
         canvas  = null;
 
         return dataURI;
-    }
+    },
+    sendMsg: (event) => {
+        event.preventDefault();
+
+        let body = {
+            sender: adminApp.mgSync.user._id
+        }
+
+
+        if(adminApp.navigation === 'tickets' ) {
+
+         
+                body.ticket = adminApp.clickMenuObj.id;
+            
+
+            body.type = "ticket";
+            body.text = $('#ticketTextarea').val();
+        }
+
+     
+        
+        
+        console.log(body);
+
+
+        postApi('/api/messages', body);
+
+    },
+    checkAuth() {
+        console.log('ran');
+    },
+    ObjectId: (m = Math, d = Date, h = 16, s = s => m.floor(s).toString(h)) =>
+    s(d.now() / 1000) + ' '.repeat(h).replace(/./g, () => s(m.random() * h))
 
 }

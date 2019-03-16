@@ -22,30 +22,23 @@ async function awaitArray() {
             adminTopContent = await contents.replace(/\<!-- Don't Edit below this line -->(.|[\r\n])+/, '');
         }
 
+        let adminCheck = {
+            'adminApp.js': true,
+            '9-getFunctions.js': true,
+            '8-postFunctions.js': true,
+            '5-datatables.js': true,
+            '6-datatables-select.js' : true,
+            '6-dataTables-buttons.js' : true,
+            '6-dataTables-editor.min.js' : true,
+            '2-jquery-ui.js' : true,
+            '6-buttons-print.min.js' : true,
+            '6-dataTables.colReorder.js' : true,
+            '6-dataTables-responsive.js' : true,
+            'moment.js' : true,
+            'letterAvatars.js' : true
+        }
 
-        if(file === 'adminApp.js') setAdmin();
-
-        if(file === '9-getFunctions.js') setAdmin();
-
-        if(file === '5-datatables.js') setAdmin();
-
-        if(file === '6-datatables-select.js') setAdmin();
-        
-        if(file === '6-dataTables-buttons.js') setAdmin();
-
-        if(file === '6-dataTables-editor.min.js') setAdmin();
-
-        if(file === '2-jquery-ui.js') setAdmin();
-
-        if(file === '6-buttons-print.min.js') setAdmin();
-
-        if(file === '6-dataTables.colReorder.js') setAdmin();
-
-        if(file === '6-dataTables-responsive.js') setAdmin();
-
-        if(file === 'moment.js') setAdmin();
-
-        if(file === 'letterAvatars.js') setAdmin();
+        if(adminCheck[file]) setAdmin();
 
         let filePath = `${dir}/js/${file}`,
             contents = await fs.readFile(filePath, 'utf8'),

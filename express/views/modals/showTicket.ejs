@@ -107,12 +107,13 @@
                                 </li>
                               </ul>
                               <div class="white">
+                                <form id="ticketSendMessage">
                                 <div class="form-group basic-textarea">
-                                  <textarea class="form-control pl-2 my-0" id="exampleFormControlTextarea2" rows="3" placeholder="Type your message here..."></textarea>
+                                  <textarea name="text" class="form-control pl-2 my-0" id="ticketTextarea" rows="3" placeholder="Type your reply here..."></textarea>
                                 </div>
                               </div>
-                              <button type="button" class="btn btn-outline-pink btn-rounded btn-sm waves-effect waves-dark float-right">Send</button>
-                    
+                              <submit @click="sendMsg" type="button" class="btn btn-outline-pink btn-rounded btn-sm waves-effect waves-dark float-right">Send</submit>
+                            </form>
                             </div>
                     
                           </div>

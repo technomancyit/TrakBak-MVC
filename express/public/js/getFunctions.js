@@ -1,3 +1,4 @@
+var userApp, userHead, adminApp
 function resendEmail() {
     console.log('test');
 }
@@ -181,28 +182,40 @@ function getApi(url, type) {
             }
 
             if (type === 'me') {
-                if (!userApp.mgSync.user) userApp.mgSync.user = {}
-                userApp.mgSync.user = JSON.parse(data);
-                userHead.mgSync.user = JSON.parse(data);
+                
+                if(userApp)  {
 
-                userHead.$forceUpdate();
-                userApp.$forceUpdate()
+                    userApp.$forceUpdate()
+                    userApp.mgSync.user = JSON.parse(data);
 
-                if (userApp.mgSync.user.verified && userApp.mgSync.user.verified !== '') {
-                    userApp.alerts.push({
-                        type: 'alert-danger',
-                        title: 'Email registration ',
-                        text: 'You must register your email before playing.',
-                        close: 'alert-dismissible',
-                        vue: "resendEmail",
-                        link: {
-                            href: "#",
-                            text: "Resend registration email"
-                        }
-                    });
+                    if (userApp.mgSync.user.verified && userApp.mgSync.user.verified !== '') {
+                        userApp.alerts.push({
+                            type: 'alert-danger',
+                            title: 'Email registration ',
+                            text: 'You must register your email before playing.',
+                            close: 'alert-dismissible',
+                            vue: "resendEmail",
+                            link: {
+                                href: "#",
+                                text: "Resend registration email"
+                            }
+                        });
+                    }
+    
                 }
+                
+                if(userHead) {
+                    userHead.mgSync.user = JSON.parse(data);
+                    userApp.$forceUpdate()
+                } 
+                if(adminApp) {
+                    adminApp.mgSync.user = JSON.parse(data);
+                    adminApp.$forceUpdate()
 
+                }
             }
+
+
 
             if (type === 'verify') {
                 userApp.mgSync = JSON.parse(data);
