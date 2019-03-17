@@ -8,6 +8,8 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
     global.config.mongo = data[4];
     require('./controllers/mongoose/mongoose');
  //  global.crud = require('./controllers/crud');
-    require('./express/server');
+    require('./services/express/server');
+
+
 
 });
