@@ -156,10 +156,12 @@ object = {
     clickMenuFunction: (id, key, type, modal) => {
         
         if(type === 'message') {
-        getApi(`/api/messages?${key}=${id}&populate=sender%20messages`, 'menuLoad');
+        getApi(`/api/messages?${key}=${id}&populate=sender%20messages&perPage=0`, 'menuLoad');
         socketJoinRoom({room:id, action:'join'})
         }
         
+        adminApp.tempRooms[modal] = {id};
+
         adminApp.clickMenuObj.id = id;
         adminApp.$forceUpdate();
 
@@ -228,6 +230,8 @@ object = {
     sendMsg: (event) => {
         event.preventDefault();
 
+        if($('#ticketTextarea').val() === '') return;
+
         let body = {
             sender: adminApp.mgSync.user._id
         }
@@ -243,13 +247,15 @@ object = {
             body.text = $('#ticketTextarea').val();
         }
 
-     
-        
-        
-        console.log(body);
+        body.socketInfo = {
+            id: socket.id,
+            script: 'socketPush',
+            object: 'ticket'
+        }
 
-
-        postApi('/api/messages', body);
+        postApi('/api/messages?populate=sender&perPage=0&excludes=-messages -groups -permissions', body, {'account':adminApp.mgSync.user, body:body});
+        
+       
 
     },
     checkAuth() {

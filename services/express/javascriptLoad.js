@@ -36,6 +36,7 @@ async function awaitArray() {
             '6-dataTables.colReorder.js' : {both:true},
             '6-dataTables-responsive.js' : {both:true},
             'moment.js' : {both:true},
+            'mgSync.js' : {both:true},
             'letterAvatars.js' : {both:true},
         }
 

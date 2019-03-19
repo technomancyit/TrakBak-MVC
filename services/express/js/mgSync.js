@@ -232,8 +232,30 @@ function recaptchaCallbackDisconnect() {
 }
 
 
+function socketInterpreter(data) {
+    if(data.options.vue) {
+
+        if(adminApp.menuObj) adminApp.menuObj.push(data.doc);
+        adminApp.$forceUpdate();
+
+        if(data.socket.id === socket.id) {
+            $('#ticketTextarea').val('');
+         //   $('.chat-message .ffscrollbar-c1').animate({scrollTop:$('.chat-message .ffscrollbar-c1')[0].scrollHeight}, 'slow');
+        }
+
+        $('.chat-message .ffscrollbar-c1').animate({scrollTop:$('.chat-message .ffscrollbar-c1')[0].scrollHeight}, 'slow');
+
+    }
+}
 
 $(document).ready(function () {
+
+    $(".modal").on("hidden.bs.modal", function () {
+        if(adminApp.tempRooms[this.id]) {
+            socketLeaveRoom({room:adminApp.tempRooms[this.id].id, action:'leave'});
+            delete adminApp.tempRooms[this.id];
+        }
+    });
 
     window.recaptchaCallback = recaptchaCallback;
     window.recaptchaCallbackDisconnect = recaptchaCallbackDisconnect;
@@ -267,9 +289,7 @@ $(document).ready(function () {
     };
 
     if (getCookie('jwt')) {
-
         getApi('/api/me', 'me');
-
     }
 
     (($) => {

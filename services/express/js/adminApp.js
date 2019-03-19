@@ -5,6 +5,7 @@ var adminApp = new Vue({
     clickMenuObj: {},
     me:'',
     menuObj: {},
+    tempRooms: {},
     navigation: "dashboard",
     tickets: [],
     mgSync: {},
@@ -180,10 +181,12 @@ var adminApp = new Vue({
     clickMenuFunction: (id, key, type, modal) => {
         
         if(type === 'message') {
-        getApi(`/api/messages?${key}=${id}&populate=sender%20messages`, 'menuLoad');
+        getApi(`/api/messages?${key}=${id}&populate=sender%20messages&perPage=0`, 'menuLoad');
         socketJoinRoom({room:id, action:'join'})
         }
         
+        adminApp.tempRooms[modal] = {id};
+
         adminApp.clickMenuObj.id = id;
         adminApp.$forceUpdate();
 
@@ -252,6 +255,8 @@ var adminApp = new Vue({
     sendMsg: (event) => {
         event.preventDefault();
 
+        if($('#ticketTextarea').val() === '') return;
+
         let body = {
             sender: adminApp.mgSync.user._id
         }
@@ -267,13 +272,15 @@ var adminApp = new Vue({
             body.text = $('#ticketTextarea').val();
         }
 
-     
-        
-        
-        console.log(body);
+        body.socketInfo = {
+            id: socket.id,
+            script: 'socketPush',
+            object: 'ticket'
+        }
 
-
-        postApi('/api/messages', body);
+        postApi('/api/messages?populate=sender&perPage=0&excludes=-messages -groups -permissions', body, {'account':adminApp.mgSync.user, body:body});
+        
+       
 
     },
     checkAuth() {

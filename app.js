@@ -1,5 +1,8 @@
 global.log = require('./functions/messenger');
 global.config = require('./config/scripts/config');
+require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
+let imap = require('./services/mail/imap/imap');
+
 
 Promise.all(require('./config/scripts/config').doneArray).then((data) => {
     global.config.bash = data[0];
@@ -10,6 +13,9 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
  //  global.crud = require('./controllers/crud');
     require('./services/express/server');
 
+    imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
+
 
 
 });
+

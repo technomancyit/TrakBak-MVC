@@ -1,8 +1,8 @@
 module.exports = (model, modelName) => {
-
+    if(!model.lastQuery) model.lastQuery = {}
     return model.pre('save', function (next) {
-        console.log(model.lastQuery = this);
-        console.log('RAN');
+      model.lastQuery[this._id] = this;
+
         this.wasNew = this.isNew;
         next();
     });

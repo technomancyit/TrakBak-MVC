@@ -73,7 +73,7 @@ router.route(pathSet).post(async (req, res) => {
                 status: 1,
                 type: req.body.type,
                 owner: sender,
-                messages: [messageID]
+                messages: []
             }
         }).catch(e => {
             console.log(e);
@@ -99,6 +99,12 @@ router.route(pathSet).post(async (req, res) => {
                             },
                             {
                                 user: req.body.name
+                            },
+                            {
+                                id: ticket._id
+                            },
+                            {
+                            msgId: messageID
                             }
                         ]
                     });

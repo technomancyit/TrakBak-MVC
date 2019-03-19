@@ -1,49 +1,90 @@
 const mongoose = require('mongoose');
-
 var ObjectId = require('mongoose').Types.ObjectId;
-
-
-
 async function populationDeep(options, populate) {
-  console.log('RAzN')
+
   var popDeep = options.deep ? options.deep : populate;
   var popArr = []
 
   if (popDeep) {
-    console.log(populate)
     await Functions.asyncForEach(populate.split(" "), async (pop) => {
-      if(pop !== '')
-      if (Object.keys(popDeep).includes(pop)) {
-       
-        popArr.push({ path: pop, populate: { path: popDeep[pop] } });
-      } else {
-        console.log('[o[', pop);
-        popArr.push({ path: pop });
-      }
+      if (pop !== '')
+      console.log(popDeep, pop, 'wa')
+        if (Object.keys(popDeep).includes(pop)) {
+          popArr.push({
+            path: pop,
+            populate: {
+              path: popDeep[pop]
+            }
+          });
+        } else {
+          popArr.push({
+            path: pop
+          });
+        }
     })
-  } 
+  }
 
   return popArr
 }
+
+
 
 module.exports = {
 
   m_create: (model) => {
 
-    return (options, _cb) => {
-   
+    return async (options, _cb) => {
+
+
+
       if (options) {
+
+        let populate = '';
+        if (options.populate && options.populate !== 'false') {
+          populate = options.populate;
+  
+          delete options.populate;
+        }
+  
+        var popArr = await populationDeep(options, populate);
+
         if (options.body) options.query = options.body;
         if (!options.type) options.type = 'create';
-   
+
         model.lastQuery = options.query;
         if (!_cb) {
-          return new Promise((resolve, reject) => {
-            eval(model)[options.type](options.query, function (err, data) {
+          return new Promise(async (resolve, reject) => {
+            
+           
+
+            await eval(model)[options.type](options.query, async function (err, data) {
               if (err) return reject({
                 err: `could not create in ${model.modelName} model. ${err.errmsg ? err.errmsg : err.errors[Object.keys(err.errors)[0]].message}`
               });
-              return resolve(data);
+
+              if(popArr.length > 0) {
+                console.log(popArr);
+
+                await Functions.asyncForEach(popArr, async (pop) => {
+                  console.log(pop)
+                  let popRef = model.schema.paths[pop.path].options.ref;
+                  let poop = await mongoose.models[popRef].m_read({query:data[pop.path], type:'findById', excludes:options.excludes}).catch(e => console.log(e));
+                  console.log(poop)
+                  data._doc[pop.path] = poop;
+                  console.log('daad', data[pop.path])
+
+                });
+              }
+
+              if(options.socketInfo) {
+                var socket = options.socketInfo;
+                console.log(_sockets.socketsClients)
+                _sockets.broadcast(socket.id, {room:options.socketInfo.object ? data[options.socketInfo.object] : data, script:socket.script, type: options.socketInfo.type ? options.socketInfo.type : 'in'}, {socket: options.socketInfo, doc:data, options:{vue:true}});
+                return resolve({socket:true});
+              } else {
+                return resolve(data);
+              }
+             
             });
           });
 
@@ -61,24 +102,26 @@ module.exports = {
   },
 
   m_read: (model) => {
-    
+
     let runFunction = eval(model);
 
     return async (options, _cb) => {
       console.log(options);
       let populate = '';
-      if(options.populate && options.populate !== 'false') {
+      if (options.populate && options.populate !== 'false') {
         populate = options.populate;
-        
+
         delete options.populate;
       }
-   
+
       var popArr = await populationDeep(options, populate);
 
       if (!options.sort) options.sort = 'createdAt'
       if (!options.direction) options.direction = 'asc'
       if (!options.perPage) options.perPage = 100;
       if (!options.page) options.page = 0;
+
+      if(!options.excludes) options.excludes = '';
 
       if (!options.query && !options.secondary && !options || !options.query && !options.secondary && Object.keys(options).length === 0) options.query = {};
       if (!options.type) options.type = 'find';
@@ -92,15 +135,20 @@ module.exports = {
 
           let noRun = false
           let promiseAll = [];
-          
-          if(!runFunction.schema.paths[value] && value.includes('.')) {
+
+          if (!runFunction.schema.paths[value] && value.includes('.')) {
             console.log(value, ' Im the rouge!');
             let newValue = value.split('.');
             let modelName = runFunction.schema.paths[newValue[0]].options.ref;
 
             let search = mongoose.models[modelName].schema.paths[newValue[1]];
-      
-            mongoose.models[modelName].m_read({query:{[newValue[1]]:options.query[value]}, or:'t'}).catch(e => console.log(e));
+
+            mongoose.models[modelName].m_read({
+              query: {
+                [newValue[1]]: options.query[value]
+              },
+              or: 't'
+            }).catch(e => console.log(e));
 
           }
           if (runFunction.schema.paths[value] && runFunction.schema.paths[value].instance === 'Number') {
@@ -145,11 +193,10 @@ module.exports = {
         options.query = or;
 
       };
-      console.log('cry', options.query);
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
-
+          
           eval(model)[options.type](options.query)
             .skip(Number(options.perPage * options.page))
             .limit(Number(options.perPage))
@@ -157,6 +204,7 @@ module.exports = {
               [options.sort]: options.direction
             })
             .populate(popArr)
+            .select('-passwordHash -password ' + options.excludes)
             .exec(async (err, doc) => {
               if (err) {
                 console.log(err);
@@ -170,9 +218,7 @@ module.exports = {
                 doc.collectionSize = await eval(model).estimatedDocumentCount(options.query).catch(e => console.log(e));
                 return resolve(doc);
 
-              }
-
-              else if (options.count) {
+              } else if (options.count) {
 
                 await eval(model).find({}).estimatedDocumentCount((err, count) => {
                   doc.collectionSize = count;
@@ -221,13 +267,15 @@ module.exports = {
   },
 
   m_update: (model) => {
-    
+
     return (options, _cb) => {
 
       if (options.body) options.query = options.body;
       if (!options.type) options.type = 'updateOne';
 
-      if(options.push) options.query = {$push: options.query};
+      if (options.push) options.query = {
+        $push: options.query
+      };
 
       if (!_cb) {
 

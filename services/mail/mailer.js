@@ -127,6 +127,7 @@ async function mailer(options, template) {
   let transporter = nodemailer.createTransport({
     host: config.mail.host,
     port: config.mail.port,
+    ignoreTLS: config.mail.ignoreTLS,
     secure: config.mail.secure, // true for 465, false for other ports
     auth
   });

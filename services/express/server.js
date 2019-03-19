@@ -150,6 +150,8 @@ async function socketLoad() {
 
 socketLoad();
 
+global._sockets = sockets;
+
 http.listen(config.express.port, () => {
     log('express-started', [ip.address(), config.express.port]);
 });

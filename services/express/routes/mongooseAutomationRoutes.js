@@ -2,6 +2,7 @@ const fs = require('fs'),
     path = require('path'),
     express = require('express'),
     server = require('../server').app,
+    io = require('../../sockets/socket.io'),
     mongoose = require('mongoose'),
     router = express.Router();
 passport = require('passport'),
@@ -42,21 +43,33 @@ async function asyncRoute() {
                         page: Object.keys(req.query).length !== 0 && req.query.page && !req.query.start ? Number(req.query.page) - 1 : req.query.start ? req.query.start / req.query.length : undefined,
                         perPage: Object.keys(req.query).length !== 0 && req.query.perPage && !req.query.length ? req.query.perPage : req.query.length ? req.query.length : undefined,
                         populate: Object.keys(req.query).length !== 0 && req.query.populate ? req.query.populate : undefined,
+                        socketInfo: Object.keys(req.query).length !== 0 && req.query.socketInfo ? req.query.socketInfo : req.body.socketInfo ? req.body.socketInfo : undefined,
+                        excludes: Object.keys(req.query).length !== 0 && req.query.excludes ? req.query.excludes : req.body.excludes ? req.body.excludes : undefined,
                         count: Object.keys(req.query).length !== 0 && req.query.count ? req.query.count : undefined,
                         or: Object.keys(req.query).length !== 0 && req.query.or ? req.query.or : undefined
                     }
+
+               
+
 
                     if (options.page || Number(options.page) === 0) delete req.query.page
                     if (options.perPage) delete req.query.perPage;
                     if (options.count) delete req.query.count;
                     if (options.populate) delete req.query.populate;
                     if (options.or) delete req.query.or;
+                    if (options.excludes) req.query.excludes ? delete req.query.excludes : delete req.body.excludes;
+                    if (options.SocketInfo) req.query.excludes ? delete req.query.socketInfo : delete req.body.socketInfo;
 
                     let query = Object.keys(req.body).length !== 0 ? {
                         query: req.body
                     } : {
                         query: req.query
                     };
+
+                    console.log(options)
+
+                    
+
 
                     let dataTableSearch = {};
 
@@ -75,7 +88,6 @@ async function asyncRoute() {
 
                             dataTableSearch[column.data] = req.query.search && req.query.search.value ? req.query.search.value : '';
 
-                            console.log('ERG', dataTableSearch[column.data])
                             if (dataTableSearch[column.data] !== '') options.searching = true;
 
                         });

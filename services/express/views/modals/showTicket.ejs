@@ -109,7 +109,7 @@
                               <div class="white">
                                 <form id="ticketSendMessage">
                                 <div class="form-group basic-textarea">
-                                  <textarea name="text" class="form-control pl-2 my-0" id="ticketTextarea" rows="3" placeholder="Type your reply here..."></textarea>
+                                  <textarea  v-on:keydown.shift.enter="sendMsg" name="text" class="form-control pl-2 my-0" id="ticketTextarea" rows="3" placeholder="Type your reply here..."></textarea>
                                 </div>
                               </div>
                               <submit @click="sendMsg" type="button" class="btn btn-outline-pink btn-rounded btn-sm waves-effect waves-dark float-right">Send</submit>

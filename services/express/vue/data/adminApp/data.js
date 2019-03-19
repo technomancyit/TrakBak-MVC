@@ -3,6 +3,7 @@ object = {
     clickMenuObj: {},
     me:'',
     menuObj: {},
+    tempRooms: {},
     navigation: "dashboard",
     tickets: [],
     mgSync: {},

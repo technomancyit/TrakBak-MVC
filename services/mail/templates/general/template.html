@@ -149,9 +149,13 @@
 
   <!-- HIDDEN PREHEADER TEXT -->
   <div
+  
     style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
-    Welcome to {{server}}. Before you can enjoy all the fun. We must verify your email.
+   We recieved your contact request. If there is anything you forgot, please reply back to this email.
   </div>
+
+  <div style="display:none">AutoGenerateTicket-Request</div>
+  <div style="display:none">{"id":"{{id}}", msgId:"{{msgId}}"}</div>
 
   <!-- HEADER -->
   <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -192,18 +196,17 @@
                       <tr>
                         <td align="center"
                           style="font-size: 25px; font-family: Helvetica, Arial, sans-serif; color: #333333; padding-top: 30px;"
-                          class="padding">{{server}} email registration</td>
+                          class="padding">{{server}} recieved your contact request.</td>
                       </tr>
                       <tr>
                         <td align="center"
                           style="padding: 20px 0 0 0; font-size: 16px; line-height: 25px; font-family: Helvetica, Arial, sans-serif; color: #666666;"
                           class="padding">Hello {{user}},
                           <br>
-                          Welcome to {{server}}. Before you can enjoy all the fun. We must verify
-                          your email. We use this to keep our members informed of server changes and updates! This also
-                          lets us try to
-                          keep accounts down to a minimal. Thank you for signing up!</td>
+                          A ticket has been generated on the behalf of this request. Someone will be with you shortly. If you have anything else you need to say. Please reply back to this email. 
+                        Thank you</td>
                       </tr>
+                      
                     </table>
                   </td>
                 </tr>

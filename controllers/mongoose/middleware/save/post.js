@@ -14,11 +14,11 @@ if (config.express.port) {
 module.exports = (model, compareName) => {
 
     return model.post('save', async doc => {
-        console.log('soup', model.lastQuery);
+
         Object.keys(doc._doc).forEach((schemaName) => {
             let ref = model.paths[schemaName].options.ref;
             if (ref) {
-                console.log(ref)
+
                 let modelName = ref;
 
                 let schemaList = mongoose.modelSchemas[modelName].paths ? mongoose.modelSchemas[modelName].paths : mongoose.models[modelName].schema.paths;
@@ -84,6 +84,15 @@ module.exports = (model, compareName) => {
                 ]
             });
         }
+
+
+
+ 
+
+          
+        
+        
+
 
     });
 }

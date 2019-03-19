@@ -56,6 +56,10 @@ function postApi(url, data, type) {
             success: function (data) {
 
                 data = JSON.parse(data);
+         //       console.log(type);
+                // if(typeof type === 'object' && type.body) socketSocketPush({room:'5c89ea1b1f550d408dbb8f8c', action:'send', body:type.body});
+                    
+                
 
                 if (data.alert) {
                     alert(data.alert.type, { title: data.alert.title, text: data.alert.text });
