@@ -1,9 +1,14 @@
 object = {
     navClick: (event) => {
+
+        if(adminApp.lastPage) socketLeaveRoom({room:adminApp.lastPage, action:'leave'});
+
         var id = event.target.id !== '' ? event.target.id : $(event.target).parent()[0].id;
         var lastNav = document.getElementById(adminApp.navigation);
         lastNav.classList.remove("active");
+        adminApp.lastPage = id;
         adminApp.navigation = id;
+        if(adminApp.lastPage) socketJoinRoom({room:id, action:'join'});
         var currentNav = document.getElementById(id);
         currentNav.classList.add("active");
         adminApp.editor = '';
@@ -15,7 +20,6 @@ object = {
             }
 
             if ($("#ticketTable")[0]) {
-
 
                 adminApp.clickMenu = [{
                         id: "id",
@@ -106,7 +110,8 @@ object = {
             }
 
         }
-        _cb()
+        
+        if(adminApp.navigation === 'tickets')  _cb()
 
         
 
@@ -157,11 +162,12 @@ object = {
         
         if(type === 'message') {
         getApi(`/api/messages?${key}=${id}&populate=sender%20messages&perPage=0`, 'menuLoad');
-        socketJoinRoom({room:id, action:'join'})
+        socketJoinRoom({room:id, action:'join'});
         }
         
+        
         adminApp.tempRooms[modal] = {id};
-
+        adminApp.modal = true;
         adminApp.clickMenuObj.id = id;
         adminApp.$forceUpdate();
 

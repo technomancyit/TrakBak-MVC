@@ -13,11 +13,13 @@ passport.use('local-signin', new LocalStrategy({
     passwordField: 'password'
 },
     async function (account, password, cb) {
-
+        console.log('THIS ACCOUNT', account);
         let user
         options = {
             query: { account },
-            type: 'findOne'
+            type: 'findOne',
+            login: true,
+            excludes: '-messages'
         }
 
         user = await Users.m_read(options).catch(e => {
@@ -27,11 +29,14 @@ passport.use('local-signin', new LocalStrategy({
 
 
         if (user) {
+
             user.validPassword(password, (data) => {
                 if (!data) {
                   
                     return cb({ err: 'err' })
                 } else {
+
+                    user.passwordHash = undefined;
                     return cb(null, user);
                 }
 

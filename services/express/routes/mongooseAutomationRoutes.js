@@ -24,16 +24,15 @@ async function asyncRoute() {
 
     await Functions.asyncForEach(modelFiles, (file) => {
         let filename = file.slice(0, file.length - 3);
-       let model = require(`${apiModels}/${file}`).options;
+        let model = require(`${apiModels}/${file}`);
         let options = {};
-        if (model) options = model;
+        if (model) options = model.options;
         options.path = options.prefix ? `/${options.prefix}/${filename}` : `/${filename}`;
 
         for (let i = 0; i < 4; i++) {
             let permissions = options.permissions ? options.permissions : undefined;
             let groups = options.groups ? options.groups : undefined;
 
-            let ergg = 'm_delete'
             let route = {
 
                 route: async (req, res) => {
@@ -43,14 +42,16 @@ async function asyncRoute() {
                         page: Object.keys(req.query).length !== 0 && req.query.page && !req.query.start ? Number(req.query.page) - 1 : req.query.start ? req.query.start / req.query.length : undefined,
                         perPage: Object.keys(req.query).length !== 0 && req.query.perPage && !req.query.length ? req.query.perPage : req.query.length ? req.query.length : undefined,
                         populate: Object.keys(req.query).length !== 0 && req.query.populate ? req.query.populate : undefined,
-                        socketInfo: Object.keys(req.query).length !== 0 && req.query.socketInfo ? req.query.socketInfo : req.body.socketInfo ? req.body.socketInfo : undefined,
+                        socketInfo: Object.keys(req.query).length !== 0 && req.query.socketInfo ? req.query.socketInfo : req.body.socketInfo ? req.body.socketInfo : {
+                            script: "socketPush",
+                            room: req.query.room ? req.query.room : req.body.room,
+                            object: req.query.type ? req.query.type : req.body ? req.body.type : undefined,
+                            id: ''
+                        },
                         excludes: Object.keys(req.query).length !== 0 && req.query.excludes ? req.query.excludes : req.body.excludes ? req.body.excludes : undefined,
                         count: Object.keys(req.query).length !== 0 && req.query.count ? req.query.count : undefined,
                         or: Object.keys(req.query).length !== 0 && req.query.or ? req.query.or : undefined
                     }
-
-               
-
 
                     if (options.page || Number(options.page) === 0) delete req.query.page
                     if (options.perPage) delete req.query.perPage;
@@ -58,18 +59,36 @@ async function asyncRoute() {
                     if (options.populate) delete req.query.populate;
                     if (options.or) delete req.query.or;
                     if (options.excludes) req.query.excludes ? delete req.query.excludes : delete req.body.excludes;
-                    if (options.SocketInfo) req.query.excludes ? delete req.query.socketInfo : delete req.body.socketInfo;
+                    if (options.socketInfo) {
+
+                        req.query.socketInfo ? delete req.query.socketInfo : delete req.body.socketInfo;
+
+                        if (types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
+                            options.populate = '';
+                            let paths = models[filename].schema.paths;
+                            await Functions.asyncForEach(Object.keys(paths), async (key) => {
+
+                                if (paths[key].options.ref) {
+                                    options.populate += `${key} `;
+
+                                }
+                            });
+                            if (req.originalUrl.includes('/api/messages')) {
+                                options.excludes = '-messages -groups -permissions';
+                                options.populate = 'sender';
+                            }
+                        }
+
+                    }
+
+                    
+
 
                     let query = Object.keys(req.body).length !== 0 ? {
                         query: req.body
                     } : {
                         query: req.query
                     };
-
-                    console.log(options)
-
-                    
-
 
                     let dataTableSearch = {};
 

@@ -233,9 +233,16 @@ function recaptchaCallbackDisconnect() {
 
 
 function socketInterpreter(data) {
+
+    console.log(data);
+
     if(data.options.vue) {
 
-        if(adminApp.menuObj) adminApp.menuObj.push(data.doc);
+        if(adminApp.navigation === 'tickets') {
+            adminApp.ticketTable.ajax.reload( null, false )
+        }
+
+        if(adminApp.menuObj && Array.isArray(adminApp.menuObj)) adminApp.menuObj.push(data.doc);
         adminApp.$forceUpdate();
 
         if(data.socket.id === socket.id) {
@@ -251,7 +258,10 @@ function socketInterpreter(data) {
 $(document).ready(function () {
 
     $(".modal").on("hidden.bs.modal", function () {
-        if(adminApp.tempRooms[this.id]) {
+        
+        if(adminApp && adminApp.tempRooms && adminApp.tempRooms[this.id]) {
+            adminApp.menuObj.activeMembers = [];
+            adminApp.modal = false;
             socketLeaveRoom({room:adminApp.tempRooms[this.id].id, action:'leave'});
             delete adminApp.tempRooms[this.id];
         }
@@ -375,6 +385,7 @@ $(document).ready(function () {
         $.each($('#userLogin').serializeArray(), function (_, kv) {
             paramObj[kv.name] = kv.value;
         });
+        
 
         postApi('/auth/login', paramObj, 'login');
     });
@@ -391,9 +402,11 @@ $("#aPassword").password({
 
 
 function setCookie(cname, cvalue, exdays) {
+   
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
+   // console.log(cname,cvalue,expires)
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 

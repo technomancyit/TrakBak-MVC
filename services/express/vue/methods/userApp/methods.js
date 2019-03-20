@@ -1,3 +1,5 @@
 object = {
-    
+    sendEmail: (event) => {
+
+    }
 }

@@ -73,9 +73,10 @@ function postApi(url, data, type) {
                 }
 
                 if (type === 'login') {
+                    console.log('RANNZZ')
                     userApp.mgSync = data;
                     userHead.mgSync = data;
-                    
+                    console.log(data.token);
                     setCookie('jwt', data.token, 1);
                     $('#userModal').modal('hide');
                     window.history.replaceState({}, document.title, "/" + "");
@@ -86,7 +87,7 @@ function postApi(url, data, type) {
                         alert('success', { title: 'Registration Successful', text: 'Please check email for registration.' });
                     } else {
                         alert('info', { title: 'Login Successful', text: 'Logged in successfully.' });
-                        if (userApp.mgSync.user[0].verified && userApp.mgSync.user[0].verified !== '') {
+                        if (userApp.mgSync.user.verified && userApp.mgSync.user.verified !== '') {
                             userApp.alerts.push({
                                 type: 'alert-danger', title: 'Email registration ', text: 'You must register your email before playing.', close: 'alert-dismissible', vue: "resendEmail",
                                 link: {

@@ -5,6 +5,8 @@ const passport = require('passport');
 
 router.post('/login', function (req, res, next) {
     res.setHeader('Content-Type', 'application/json');
+
+
     passport.authenticate('local-signin', { session: false }, (err, user, info) => {
         if (err || !user) {
             console.log('ER', err, user);
@@ -16,8 +18,12 @@ router.post('/login', function (req, res, next) {
             if (err) {
                 return res.send(err);
             } else {
+
+
                 
             let token = await jwt.sign(JSON.stringify(user), config.express.jwt);
+
+            console.log('RANz', token);
           // user = user.user;
             return res.json({token, user});
             }

@@ -6,8 +6,8 @@
      * based on https://gist.github.com/leecrossley/6027780
      */
     (function(w, d){
-
-
+        if(!adminApp) adminApp = {}
+        
         adminApp.LetterAvatar =  (name, size) => {
 
             name  = name || '';

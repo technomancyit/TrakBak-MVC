@@ -94,6 +94,7 @@ module.exports = class Sockets {
         let type = options.type ? options.type : 'in';
 
         if(type === 'in') {
+            console.log('RANz', type, options.room, options.script)
             this.io[type](options.room).emit(options.script, data);
         } else {
             socket.broadcast[type](options.room).emit(options.script, data);

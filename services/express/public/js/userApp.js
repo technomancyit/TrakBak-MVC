@@ -20,7 +20,9 @@ var userApp = new Vue({
     watch: {
     },
     methods: { 
-    
+    sendEmail: (event) => {
+
+    }
  },
     
     end: {

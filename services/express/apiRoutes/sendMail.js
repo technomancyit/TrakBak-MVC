@@ -66,6 +66,12 @@ router.route(pathSet).post(async (req, res) => {
                 ticket: ticketID,
                 text: req.body.message
         }}).catch( e => console.log(e));
+
+        let socketInfo =  {
+            "script": "socketPush",
+            "name": "tickets"
+           }
+           
         
         let ticket = await models.Tickets.m_create({
             body: {
@@ -74,7 +80,8 @@ router.route(pathSet).post(async (req, res) => {
                 type: req.body.type,
                 owner: sender,
                 messages: []
-            }
+            },
+                socketInfo
         }).catch(e => {
             console.log(e);
             error.err = "Could not create contact ticket"
@@ -101,7 +108,7 @@ router.route(pathSet).post(async (req, res) => {
                                 user: req.body.name
                             },
                             {
-                                id: ticket._id
+                                id: ticketID
                             },
                             {
                             msgId: messageID

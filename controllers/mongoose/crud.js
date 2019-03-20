@@ -8,7 +8,7 @@ async function populationDeep(options, populate) {
   if (popDeep) {
     await Functions.asyncForEach(populate.split(" "), async (pop) => {
       if (pop !== '')
-      console.log(popDeep, pop, 'wa')
+
         if (Object.keys(popDeep).includes(pop)) {
           popArr.push({
             path: pop,
@@ -17,8 +17,10 @@ async function populationDeep(options, populate) {
             }
           });
         } else {
+          let select = pop === 'sender' ? '-passwordHash' : undefined;
           popArr.push({
-            path: pop
+            path: pop,
+            select
           });
         }
     })
@@ -35,7 +37,7 @@ module.exports = {
 
     return async (options, _cb) => {
 
-
+ 
 
       if (options) {
 
@@ -46,7 +48,10 @@ module.exports = {
           delete options.populate;
         }
   
+
         var popArr = await populationDeep(options, populate);
+
+        
 
         if (options.body) options.query = options.body;
         if (!options.type) options.type = 'create';
@@ -63,23 +68,26 @@ module.exports = {
               });
 
               if(popArr.length > 0) {
-                console.log(popArr);
+    
 
                 await Functions.asyncForEach(popArr, async (pop) => {
-                  console.log(pop)
+
+               
+     
                   let popRef = model.schema.paths[pop.path].options.ref;
+                 
                   let poop = await mongoose.models[popRef].m_read({query:data[pop.path], type:'findById', excludes:options.excludes}).catch(e => console.log(e));
-                  console.log(poop)
+
                   data._doc[pop.path] = poop;
-                  console.log('daad', data[pop.path])
+    
 
                 });
               }
 
               if(options.socketInfo) {
                 var socket = options.socketInfo;
-                console.log(_sockets.socketsClients)
-                _sockets.broadcast(socket.id, {room:options.socketInfo.object ? data[options.socketInfo.object] : data, script:socket.script, type: options.socketInfo.type ? options.socketInfo.type : 'in'}, {socket: options.socketInfo, doc:data, options:{vue:true}});
+         
+                _sockets.broadcast(socket.id, {room:socket.name ? socket.name : socket.object ? data[socket.object]._id : data._id, script:socket.script, type: socket.type ? socket.type : 'in'}, {socket: socket, doc:data, options:{vue:true}});
                 return resolve({socket:true});
               } else {
                 return resolve(data);
@@ -106,7 +114,7 @@ module.exports = {
     let runFunction = eval(model);
 
     return async (options, _cb) => {
-      console.log(options);
+
       let populate = '';
       if (options.populate && options.populate !== 'false') {
         populate = options.populate;
@@ -122,6 +130,9 @@ module.exports = {
       if (!options.page) options.page = 0;
 
       if(!options.excludes) options.excludes = '';
+      let defaultExcludes = options.login ? ' ' : '-passwordHash -password '
+
+
 
       if (!options.query && !options.secondary && !options || !options.query && !options.secondary && Object.keys(options).length === 0) options.query = {};
       if (!options.type) options.type = 'find';
@@ -196,6 +207,8 @@ module.exports = {
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
+
+          console.log('da fuck' , typeof defaultExcludes)
           
           eval(model)[options.type](options.query)
             .skip(Number(options.perPage * options.page))
@@ -204,7 +217,7 @@ module.exports = {
               [options.sort]: options.direction
             })
             .populate(popArr)
-            .select('-passwordHash -password ' + options.excludes)
+            .select(defaultExcludes + options.excludes)
             .exec(async (err, doc) => {
               if (err) {
                 console.log(err);

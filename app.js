@@ -13,8 +13,10 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
  //  global.crud = require('./controllers/crud');
     require('./services/express/server');
 
-    imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
+ //   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
 
+
+    setTimeout(function(){   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'}); }, 60000);
 
 
 });

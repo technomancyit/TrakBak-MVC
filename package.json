@@ -12,6 +12,7 @@
   "dependencies": {
     "babel-minify": "^0.5.0",
     "bcrypt-nodejs": "0.0.3",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "camelcase": "^5.2.0",
     "chalk": "^2.4.2",
@@ -29,6 +30,7 @@
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.0",
     "jwt-simple": "^0.5.5",
+    "mailparser": "^2.5.0",
     "mongoose": "^5.4.17",
     "mongoose-unique-validator": "^2.0.2",
     "mysql-password": "0.0.1",
