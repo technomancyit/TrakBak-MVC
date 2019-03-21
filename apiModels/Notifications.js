@@ -1,29 +1,47 @@
 const mongoose = require('mongoose'),
     uniqueValidator = require("mongoose-unique-validator"),
-    crud = require('../controllers/mongoose/crud'),
-    bcrypt = require('bcrypt-nodejs'),
-    modelName = 'Tickets',
-    mailer = require('../services/mail/mailer');
+    crud = require('../controllers/mongoose/crud');
+
+var modelName = 'Notifications';
 
 var schema = new mongoose.Schema({
-    
-    type: {
+    actions: {
+        type: Object,
+        required: true
+    },
+    creator: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Users'
+    },
+    link: Boolean,
+    text: {
         type: String,
         required: true
     },
+    groups: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Tickets'
+    }],
+    groups: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Groups'
+    }],
+    users: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Users'
+    }],
     messages: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Messages'
     }],
-    owner: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Users',
-        required: true
+    enabled: {
+        type: Boolean,
+        default: true
     },
-    categories: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'Categories'
-    }],
+    status: {
+        type: Boolean,
+        default: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -34,10 +52,9 @@ var schema = new mongoose.Schema({
     }
 });
 
-
-
 require('../controllers/mongoose/middleware/mongooseAutoMiddleware')(schema, modelName);
 
+schema.plugin(uniqueValidator);
 var Model = mongoose.model(modelName, schema);
 
 let crudObj = {
@@ -49,15 +66,14 @@ let crudObj = {
 
 Model = Object.assign(Model, crudObj);
 
-mongoose.models[modelName] = Model;
-//console.log(mongoose.models[modelName]);
 const options = {
     prefix: 'api',
     routes: {
         m_create: {
+
         },
         m_read: {
-            permissions: 1
+
         },
         m_update: {
             permissions: 1
@@ -69,6 +85,6 @@ const options = {
 }
 
 module.exports = {
-    'Tickets':Model,
+    [modelName]: Model,
     options
 };

@@ -1,8 +1,8 @@
 var userHead = new Vue({
     el: '#userHead',
-    data:{
-      
-    },
+    data: { 
+    mgSync: {}
+ },
     watch: {
     },
     methods: { 

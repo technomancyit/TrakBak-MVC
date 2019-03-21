@@ -16,7 +16,7 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
  //   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
 
 
-    setTimeout(function(){   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'}); }, 60000);
+    setTimeout(function(){   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'}); }, 6000);
 
 
 });

@@ -63,7 +63,8 @@ module.exports = {
            
 
             await eval(model)[options.type](options.query, async function (err, data) {
-              if (err) return reject({
+              if (err) 
+                return reject({
                 err: `could not create in ${model.modelName} model. ${err.errmsg ? err.errmsg : err.errors[Object.keys(err.errors)[0]].message}`
               });
 

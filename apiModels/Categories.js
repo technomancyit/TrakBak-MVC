@@ -1,29 +1,28 @@
 const mongoose = require('mongoose'),
     uniqueValidator = require("mongoose-unique-validator"),
     crud = require('../controllers/mongoose/crud'),
-    bcrypt = require('bcrypt-nodejs'),
-    modelName = 'Tickets',
-    mailer = require('../services/mail/mailer');
+    bcrypt = require('bcrypt-nodejs');
+
+var modelName = 'Categories';
 
 var schema = new mongoose.Schema({
-    
-    type: {
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    description: {
         type: String,
         required: true
     },
-    messages: [{
+    tickets: [{
         type: mongoose.Schema.ObjectId,
-        ref: 'Messages'
+        ref: 'Tickets'
     }],
-    owner: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Users',
-        required: true
+    enabled: {
+        type: Boolean,
+        default: true
     },
-    categories: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'Categories'
-    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -34,10 +33,9 @@ var schema = new mongoose.Schema({
     }
 });
 
-
-
 require('../controllers/mongoose/middleware/mongooseAutoMiddleware')(schema, modelName);
 
+schema.plugin(uniqueValidator);
 var Model = mongoose.model(modelName, schema);
 
 let crudObj = {
@@ -49,15 +47,14 @@ let crudObj = {
 
 Model = Object.assign(Model, crudObj);
 
-mongoose.models[modelName] = Model;
-//console.log(mongoose.models[modelName]);
 const options = {
     prefix: 'api',
     routes: {
         m_create: {
+
         },
         m_read: {
-            permissions: 1
+
         },
         m_update: {
             permissions: 1
@@ -69,6 +66,6 @@ const options = {
 }
 
 module.exports = {
-    'Tickets':Model,
+    [modelName]: Model,
     options
 };

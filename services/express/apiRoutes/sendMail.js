@@ -1,19 +1,16 @@
 const express = require('express'),
     mongoose = require('mongoose')
-    models = mongoose.models,
+models = mongoose.models,
     server = require('../server').app,
     randomstring = require("randomstring"),
     mailer = require('../../../services/mail/mailer'),
-    Verifier = require("email-verifier"),
-    {
+    Verifier = require("email-verifier"), {
         Tickets
     } = require("../../../apiModels/Tickets"),
-    cookie = require('cookie'),
-    {
+    cookie = require('cookie'), {
         promisify
     } = require("util"),
-    jwt = require('jsonwebtoken'),
-    {
+    jwt = require('jsonwebtoken'), {
         Users
     } = require('../../../apiModels/Users'),
     router = express.Router()
@@ -42,53 +39,58 @@ router.route(pathSet).post(async (req, res) => {
     verifiedEmail.dnsCheck = (verifiedEmail.dnsCheck === 'true');
 
     if (verifiedEmail.formatCheck && verifiedEmail.smtpCheck && verifiedEmail.dnsCheck || verifiedEmail.formatCheck && verifiedEmail.freeCheck && verifiedEmail.dnsCheck) {
-        
+
         let randomPassword = randomstring.generate(32);
         let user = await models.Users.m_create({
             query: {
-                account:req.body.email,
-                email:req.body.email,
-                status:2,
+                account: req.body.email,
+                email: req.body.email,
+                status: 2,
                 permissions: 2,
-                password:randomPassword
-        }}).catch( e => console.log(e));
+                password: randomPassword
+            }
+        }).catch(e => console.log(e));
 
-        let sender = user ? user._id : await models.Users.m_read({query:{email:req.body.email}, type:'findOne'}).catch(e => e);
-        
-        if(sender && typeof sender === 'object') sender = sender._id
+        let sender = user ? user._id : await models.Users.m_read({
+            query: {
+                email: req.body.email
+            },
+            type: 'findOne'
+        }).catch(e => e);
+
+        if (sender && typeof sender === 'object') sender = sender._id
         var ticketID = mongoose.Types.ObjectId();
         var messageID = mongoose.Types.ObjectId();
         let message = models.Messages.m_create({
             query: {
-                _id: messageID,
-                type:"ticket",
+                type: "ticket",
                 sender,
                 ticket: ticketID,
                 text: req.body.message
-        }}).catch( e => console.log(e));
+            }
+        }).catch(e => console.log(e));
 
-        let socketInfo =  {
+        let socketInfo = {
             "script": "socketPush",
             "name": "tickets"
-           }
-           
-        
+        }
+
         let ticket = await models.Tickets.m_create({
             body: {
                 _id: ticketID,
                 status: 1,
+                categories: "5c93252638d1d421e95defdd",
                 type: req.body.type,
-                owner: sender,
-                messages: []
+                owner: sender
             },
-                socketInfo
+            socketInfo
         }).catch(e => {
             console.log(e);
             error.err = "Could not create contact ticket"
         });
 
         if (ticket) {
-         
+
 
             switch (req.body.template) {
                 case "general":
@@ -111,7 +113,7 @@ router.route(pathSet).post(async (req, res) => {
                                 id: ticketID
                             },
                             {
-                            msgId: messageID
+                                msgId: messageID
                             }
                         ]
                     });
