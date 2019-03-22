@@ -3,6 +3,7 @@ const fs = require('fs'),
     express = require('express'),
     server = require('../server').app,
     io = require('../../sockets/socket.io'),
+    systemNotification = require('../../systemNotifications'),
     mongoose = require('mongoose'),
     router = express.Router();
 passport = require('passport'),
@@ -13,10 +14,12 @@ passport = require('passport'),
 
 const modelFiles = fs.readdirSync(apiModels);
 
-models = mongoose.models
+let models = mongoose.models,
 
-types = ['post', 'get', 'put', 'delete'];
-crud = ['m_create', 'm_read', 'm_update', 'm_delete'];
+    secondarySearch = [],
+
+    types = ['post', 'get', 'put', 'delete'],
+    crud = ['m_create', 'm_read', 'm_update', 'm_delete'];
 
 rf = [];
 
@@ -36,9 +39,11 @@ async function asyncRoute() {
             let route = {
 
                 route: async (req, res) => {
+                      
                     res.setHeader('Content-Type', 'application/json');
 
                     let options = {
+                        client: req.headers && req.headers.referer && req.headers.referer.includes(config.express.hostname) ? true : false,
                         page: Object.keys(req.query).length !== 0 && req.query.page && !req.query.start ? Number(req.query.page) - 1 : req.query.start ? req.query.start / req.query.length : undefined,
                         perPage: Object.keys(req.query).length !== 0 && req.query.perPage && !req.query.length ? req.query.perPage : req.query.length ? req.query.length : undefined,
                         populate: Object.keys(req.query).length !== 0 && req.query.populate ? req.query.populate : undefined,
@@ -81,9 +86,6 @@ async function asyncRoute() {
 
                     }
 
-                    
-
-
                     let query = Object.keys(req.body).length !== 0 ? {
                         query: req.body
                     } : {
@@ -100,10 +102,7 @@ async function asyncRoute() {
 
                                 options.sort = column.data;
                                 options.direction = req.query.order[0].dir;
-
                             }
-
-                            let searchString;
 
                             dataTableSearch[column.data] = req.query.search && req.query.search.value ? req.query.search.value : '';
 
@@ -130,6 +129,57 @@ async function asyncRoute() {
                             break;
                     }
 
+                    await Functions.asyncForEach(Object.keys(query.query), async (key) => {
+
+                        var popSearch = key.split('.');
+                        var value = query.query[key];
+
+
+                        if (popSearch.length > 1) {
+                            modelName = file.slice(0, -3);
+
+                            let ref = Array.isArray(model[modelName].schema.paths[popSearch[0]].options.type) ?
+                                model[modelName].schema.paths[popSearch[0]].options.type[0].ref :
+                                model[modelName].schema.paths[popSearch[0]].options.ref;
+
+                            let pOptions = JSON.parse(JSON.stringify(options));
+                            pOptions.sort = popSearch[1];
+                            delete pOptions.populate;
+
+                            let combine = Object.assign({
+                                    query: {
+                                        [popSearch[1]]: value
+                                    }
+                                },
+                                pOptions);
+
+                            let lookup = await models[ref].m_read(
+                                combine
+                            ).catch(e => console.log(e));
+
+                            if (lookup && !Array.isArray(lookup) || Array.isArray(lookup) && lookup.length !== 0) {
+                                delete query.query[key];
+                                let ids = {
+                                    $in: []
+                                }
+
+                                await Functions.asyncForEach(lookup, (doc) => {
+                                    ids.$in.push(mongoose.Types.ObjectId(doc._id))
+                                });
+
+                                query.query[popSearch[0]] = ids.length === 0 ? lookup[0]._id : ids;
+                                if (query.sort === key) {
+                                    query.sort = popSearch[0];
+                                }
+
+                            } else {
+                                delete query.query[key];
+
+                            }
+                        }
+
+                    });
+
                     let data = await models[filename][crud[i]](query).catch(e => console.log(e));
                     if (data && data.collectionSize) {
 
@@ -149,7 +199,10 @@ async function asyncRoute() {
                     } else if (!data) {
                         data = {};
                     }
-
+                    if (types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
+                        let sendData = data.data ? data.data : data;
+                        systemNotification(filename, sendData);
+                    }
                     res.status(200).send(JSON.stringify(data));
 
                 },

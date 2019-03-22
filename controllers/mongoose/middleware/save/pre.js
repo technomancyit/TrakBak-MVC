@@ -1,10 +1,11 @@
-module.exports = (model, modelName) => {
-    if(!model.lastQuery) model.lastQuery = {}
-    return model.pre('save', function (next) {
-      model.lastQuery[this._id] = this;
+mongoose = require('mongoose');
 
-        this.wasNew = this.isNew;
-        next();
-    });
+module.exports = (model, modelName) => {
+
+  if (!model.lastQuery) model.lastQuery = {}
+  return model.pre('save', function (next) {
+
+    next();
+  });
 
 }

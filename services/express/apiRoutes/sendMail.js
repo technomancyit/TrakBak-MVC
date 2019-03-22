@@ -1,6 +1,7 @@
 const express = require('express'),
     mongoose = require('mongoose')
-models = mongoose.models,
+    models = mongoose.models,
+    systemNotification = require('../../systemNotifications'),
     server = require('../server').app,
     randomstring = require("randomstring"),
     mailer = require('../../../services/mail/mailer'),
@@ -67,7 +68,7 @@ router.route(pathSet).post(async (req, res) => {
                 sender,
                 ticket: ticketID,
                 text: req.body.message
-            }
+            },noNotification: true
         }).catch(e => console.log(e));
 
         let socketInfo = {
@@ -91,6 +92,7 @@ router.route(pathSet).post(async (req, res) => {
 
         if (ticket) {
 
+            systemNotification('Tickets', ticket);
 
             switch (req.body.template) {
                 case "general":
@@ -135,6 +137,8 @@ router.route(pathSet).post(async (req, res) => {
         return res.status(404).send(JSON.stringify(error));
 
     }
+
+ 
 
     return res.status(200).send(JSON.stringify({}));
 

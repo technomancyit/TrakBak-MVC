@@ -65,6 +65,7 @@ schema.virtual("password").set(function (value) {
         this.passwordHash = bcrypt.hashSync(value, bcrypt.genSaltSync(12));
 });
 
+
 schema.plugin(uniqueValidator);
 var Model = mongoose.model(modelName, schema);
 

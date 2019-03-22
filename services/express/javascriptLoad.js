@@ -38,6 +38,7 @@ async function awaitArray() {
             'moment.js' : {both:true},
             'mgSync.js' : {both:true},
             'letterAvatars.js' : {both:true},
+            '9-toastr.min.js' : {both:true}
         }
 
         if(adminCheck[file]) await setAdmin(adminCheck[file].both);

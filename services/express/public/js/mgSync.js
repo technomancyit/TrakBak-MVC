@@ -410,12 +410,18 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-function alert(type, msg, options) {
+function navAlert(type, msg, options) {
+    console.log(type, msg, options)
     if (options) {
         toastr.options = options;
     }
 
-    toastr[type](msg.text, msg.title);
+    if(msg) {
+        toastr[type](msg.text, msg.title);
+    } else {
+        toastr['error'](type, 'Datatable error');
+    }
+    
 }
 
 

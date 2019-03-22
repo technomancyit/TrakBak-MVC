@@ -19,9 +19,17 @@ var schema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Tickets'
     }],
+    groups: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Groups'
+    }],
     enabled: {
         type: Boolean,
         default: true
+    },
+    permissions: {
+        type: Number,
+        default : 1
     },
     createdAt: {
         type: Date,

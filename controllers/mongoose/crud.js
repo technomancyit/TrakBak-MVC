@@ -37,21 +37,21 @@ module.exports = {
 
     return async (options, _cb) => {
 
- 
+
 
       if (options) {
 
         let populate = '';
         if (options.populate && options.populate !== 'false') {
           populate = options.populate;
-  
+
           delete options.populate;
         }
-  
+
 
         var popArr = await populationDeep(options, populate);
 
-        
+
 
         if (options.body) options.query = options.body;
         if (!options.type) options.type = 'create';
@@ -59,41 +59,59 @@ module.exports = {
         model.lastQuery = options.query;
         if (!_cb) {
           return new Promise(async (resolve, reject) => {
-            
-           
+
+
 
             await eval(model)[options.type](options.query, async function (err, data) {
-              if (err) 
+              if (err)
                 return reject({
-                err: `could not create in ${model.modelName} model. ${err.errmsg ? err.errmsg : err.errors[Object.keys(err.errors)[0]].message}`
-              });
+                  err: `could not create in ${model.modelName} model. ${err.errmsg ? err.errmsg : err.errors[Object.keys(err.errors)[0]].message}`
+                });
 
-              if(popArr.length > 0) {
-    
+              if (popArr.length > 0) {
+
 
                 await Functions.asyncForEach(popArr, async (pop) => {
 
-               
-     
+
+
                   let popRef = model.schema.paths[pop.path].options.ref;
-                 
-                  let poop = await mongoose.models[popRef].m_read({query:data[pop.path], type:'findById', excludes:options.excludes}).catch(e => console.log(e));
+
+                  let poop = await mongoose.models[popRef].m_read({
+                    query: data[pop.path],
+                    type: 'findById',
+                    excludes: options.excludes
+                  }).catch(e => console.log(e));
 
                   data._doc[pop.path] = poop;
-    
+
 
                 });
               }
 
-              if(options.socketInfo) {
+              if (options.socketInfo) {
                 var socket = options.socketInfo;
-         
-                _sockets.broadcast(socket.id, {room:socket.name ? socket.name : socket.object ? data[socket.object]._id : data._id, script:socket.script, type: socket.type ? socket.type : 'in'}, {socket: socket, doc:data, options:{vue:true}});
-                return resolve({socket:true});
-              } else {
-                return resolve(data);
+
+                _sockets.broadcast(socket.id, {
+                  room: socket.name ? socket.name : socket.object ? data[socket.object]._id : data._id,
+                  script: socket.script,
+                  type: socket.type ? socket.type : 'in'
+                }, {
+                  socket: socket,
+                  doc: data,
+                  options: {
+                    vue: true
+                  }
+                });
+                if(options.client)
+                return resolve({
+                  socket: true,
+                  data: data
+                });
               }
-             
+                return resolve(data);
+              
+
             });
           });
 
@@ -130,10 +148,10 @@ module.exports = {
       if (!options.perPage) options.perPage = 100;
       if (!options.page) options.page = 0;
 
-      if(!options.excludes) options.excludes = '';
+
+
+      if (!options.excludes) options.excludes = '';
       let defaultExcludes = options.login ? ' ' : '-passwordHash -password '
-
-
 
       if (!options.query && !options.secondary && !options || !options.query && !options.secondary && Object.keys(options).length === 0) options.query = {};
       if (!options.type) options.type = 'find';
@@ -151,11 +169,13 @@ module.exports = {
           if (!runFunction.schema.paths[value] && value.includes('.')) {
             console.log(value, ' Im the rouge!');
             let newValue = value.split('.');
-            let modelName = runFunction.schema.paths[newValue[0]].options.ref;
+            let modelName = runFunction.schema.paths[newValue[0]].options.ref ?  runFunction.schema.paths[newValue[0]].options.ref  :  runFunction.schema.paths[newValue[0]].options.type[0].ref;
 
             let search = mongoose.models[modelName].schema.paths[newValue[1]];
 
-            mongoose.models[modelName].m_read({
+            
+
+            await mongoose.models[modelName].m_read({
               query: {
                 [newValue[1]]: options.query[value]
               },
@@ -181,6 +201,20 @@ module.exports = {
 
 
           if (runFunction.schema.paths[value] && runFunction.schema.paths[value].instance === 'ObjectID') {
+
+
+            noRun = true
+            if (ObjectId.isValid(options.query[value]) || options.query[value].$in) {
+              or.$or.push({
+                [value]: options.query[value]
+              });
+            }
+
+          }
+
+          if (runFunction.schema.paths[value] && runFunction.schema.paths[value].instance === 'Array') {
+
+
 
             noRun = true
             if (ObjectId.isValid(options.query[value])) {
@@ -208,9 +242,6 @@ module.exports = {
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
-
-          console.log('da fuck' , typeof defaultExcludes)
-          
           eval(model)[options.type](options.query)
             .skip(Number(options.perPage * options.page))
             .limit(Number(options.perPage))

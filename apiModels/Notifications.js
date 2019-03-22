@@ -5,6 +5,10 @@ const mongoose = require('mongoose'),
 var modelName = 'Notifications';
 
 var schema = new mongoose.Schema({
+    type: {
+        type: Number,
+        requred: true
+    },
     actions: {
         type: Object,
         required: true
@@ -18,7 +22,7 @@ var schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    groups: [{
+    tickets: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Tickets'
     }],

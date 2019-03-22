@@ -1,6 +1,6 @@
 const Imap = require('imap'),
-Promise = require("bluebird");
-Promise.longStackTraces();
+systemNotification = require('../../systemNotifications');
+
 
 async function extractJSON(str) {
   var firstOpen, firstClose, candidate;
@@ -90,8 +90,10 @@ module.exports = (auth, options) => {
                 var text = buffer;
                 let reg = new RegExp(`Content-Transfer-Encoding(.|\n|\r)+${auth.user}`, 'i');
                 let findText = text.match(reg);
+                
+                object = await extractJSON(text);
 
-                object = await extractJSON(text)[0];
+                object = object[0];
 
                 if (findText) {
                   let text = findText[0].split('\n');
@@ -113,8 +115,7 @@ module.exports = (auth, options) => {
             //    console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
           });
           msg.once('end', async function () {
-
-            var email = header.undefinedfrom[0].match(/<(.*?)>/)[0].substring(1, header.undefinedfrom[0].match(/<(.*?)>/)[0].length - 1);
+            var email = header.undefinedfrom ? header.undefinedfrom[0].match(/<(.*?)>/)[0].substring(1, header.undefinedfrom[0].match(/<(.*?)>/)[0].length - 1) : header.from[0].match(/<(.*?)>/)[0].substring(1, header.from[0].match(/<(.*?)>/)[0].length - 1);
 
             let user = await models.Users.m_read({
               query: {
@@ -137,12 +138,13 @@ module.exports = (auth, options) => {
                 "object": "ticket"
               }
 
-              models.Messages.m_create({
+              let messageDoc = await models.Messages.m_create({
+                client: true,
                 body: message,
                 socketInfo,
                 populate: 'sender'
               }).catch(e => console.log(e));
-
+              systemNotification('Messages', messageDoc.data);
             }
 
             imap.seq.move(seqno, 'processed', (err, data) => {

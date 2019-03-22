@@ -9,6 +9,14 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
     global.config.mail = data[2];
     global.config.express = data[3];
     global.config.mongo = data[4];
+
+    global.hostname;
+    if (config.express.port) {
+        global.hostname = `${config.express.hostname}:${config.express.port}`
+    } else {
+        global.hostname = config.express.hostname;
+    }
+
     require('./controllers/mongoose/mongoose');
  //  global.crud = require('./controllers/crud');
     require('./services/express/server');

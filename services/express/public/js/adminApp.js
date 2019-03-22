@@ -74,7 +74,7 @@ var adminApp = new Vue({
                     responsive: true,
                     colReorder: true,
                     autoWidth: false,
-                    ajax: `/api/tickets?count=t&or=t&populate=owner messages`,
+                    ajax: `/api/tickets?count=t&or=t&populate=owner messages categories`,
 
                     
                     columns: [
@@ -85,9 +85,20 @@ var adminApp = new Vue({
                             "width": "20%"
                         },
                         {
-                            "data": "status",
-                            "name": "status",
-                            "width": "5%"
+                            "data": "categories.name",
+                            "width": "5%",
+                            render: function (data, type, row) {
+                                if(row && row.categories && Array.isArray(row.categories) && row.categories.length > 0) {
+                                    console.log('RAN F', row.categories)
+                                    return row.categories = row.categories[0].name;
+                                } else if(row && row.categories) {
+                                    console.log('RAN');
+                                    return row.categories = 'None';
+                                } else {
+                                    console.log('RANLAT')
+                                  return;
+                                }
+                            }
                         },
                         {
                             "data": "type",
@@ -95,8 +106,8 @@ var adminApp = new Vue({
                             "width": "15%"
                         },
                         {
-                            "data": "owner.email",
-                            "name": "owner.email",
+                            "data": "owner.account",
+                            "name": "owner.account",
                             "width": "15%"
                         },
                         {
