@@ -1,7 +1,7 @@
 const express = require('express'),
     mongoose = require('mongoose')
     models = mongoose.models,
-    systemNotification = require('../../systemNotifications'),
+    systemNotification = require('../../notifications/systemNotifications'),
     server = require('../server').app,
     randomstring = require("randomstring"),
     mailer = require('../../../services/mail/mailer'),

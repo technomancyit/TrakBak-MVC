@@ -3,8 +3,9 @@ const fs = require('fs'),
     express = require('express'),
     server = require('../server').app,
     io = require('../../sockets/socket.io'),
-    systemNotification = require('../../systemNotifications'),
+    systemNotification = require('../../notifications/systemNotifications'),
     mongoose = require('mongoose'),
+    Notification = require('../../notifications/userNotification'),
     router = express.Router();
 passport = require('passport'),
     dir = __dirname,
@@ -55,7 +56,8 @@ async function asyncRoute() {
                         },
                         excludes: Object.keys(req.query).length !== 0 && req.query.excludes ? req.query.excludes : req.body.excludes ? req.body.excludes : undefined,
                         count: Object.keys(req.query).length !== 0 && req.query.count ? req.query.count : undefined,
-                        or: Object.keys(req.query).length !== 0 && req.query.or ? req.query.or : undefined
+                        or: Object.keys(req.query).length !== 0 && req.query.or ? req.query.or : undefined,
+                        searching: Object.keys(req.query).length !== 0 && req.query.searching ? req.query.searching : undefined
                     }
 
                     if (options.page || Number(options.page) === 0) delete req.query.page
@@ -64,6 +66,7 @@ async function asyncRoute() {
                     if (options.populate) delete req.query.populate;
                     if (options.or) delete req.query.or;
                     if (options.excludes) req.query.excludes ? delete req.query.excludes : delete req.body.excludes;
+                    if (options.searching) req.query.searching ? delete req.query.searching : delete req.body.searching;
                     if (options.socketInfo) {
 
                         req.query.socketInfo ? delete req.query.socketInfo : delete req.body.socketInfo;
@@ -130,12 +133,15 @@ async function asyncRoute() {
                     }
 
                     await Functions.asyncForEach(Object.keys(query.query), async (key) => {
-
+        
                         var popSearch = key.split('.');
                         var value = query.query[key];
 
 
                         if (popSearch.length > 1) {
+
+                 
+                          
                             modelName = file.slice(0, -3);
 
                             let ref = Array.isArray(model[modelName].schema.paths[popSearch[0]].options.type) ?
@@ -143,7 +149,10 @@ async function asyncRoute() {
                                 model[modelName].schema.paths[popSearch[0]].options.ref;
 
                             let pOptions = JSON.parse(JSON.stringify(options));
+
                             pOptions.sort = popSearch[1];
+                            pOptions.page = 0;
+                            pOptions.perPage = 0;
                             delete pOptions.populate;
 
                             let combine = Object.assign({
@@ -153,21 +162,34 @@ async function asyncRoute() {
                                 },
                                 pOptions);
 
+                              
+                            
                             let lookup = await models[ref].m_read(
                                 combine
                             ).catch(e => console.log(e));
 
+                     
+                         //   console.log('SR', lookup)
                             if (lookup && !Array.isArray(lookup) || Array.isArray(lookup) && lookup.length !== 0) {
                                 delete query.query[key];
                                 let ids = {
                                     $in: []
                                 }
 
+                                if(Array.isArray(lookup) && lookup.length > 1) { 
                                 await Functions.asyncForEach(lookup, (doc) => {
                                     ids.$in.push(mongoose.Types.ObjectId(doc._id))
                                 });
+                            }
 
-                                query.query[popSearch[0]] = ids.length === 0 ? lookup[0]._id : ids;
+                               
+
+                                query.query[popSearch[0]] = ids.$in.length === 0 ? lookup[0]._id : ids;
+                        
+                              
+                               
+                           //     query.query.categories = mongoose.Types.ObjectId(lookup[0]._id);
+
                                 if (query.sort === key) {
                                     query.sort = popSearch[0];
                                 }
@@ -176,16 +198,22 @@ async function asyncRoute() {
                                 delete query.query[key];
 
                             }
+
                         }
 
                     });
 
+           //         console.log('DA FUCK', query.query)
+
                     let data = await models[filename][crud[i]](query).catch(e => console.log(e));
                     if (data && data.collectionSize) {
 
+                        console.log(data.collectionSize)
                         let collectionSize = data.collectionSize;
                         let recordsFiltered = data.searchCount ? data.searchCount : collectionSize
                         delete data.collectionSize;
+
+                        
 
                         let dataTableObj = {
                             data: data,
@@ -201,7 +229,13 @@ async function asyncRoute() {
                     }
                     if (types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
                         let sendData = data.data ? data.data : data;
-                        systemNotification(filename, sendData);
+                   //     systemNotification(filename, sendData);
+
+                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename]});
+                        // notfication.socketNotification()
+                        // notfication.emailNotification()
+                        notfication.exec(['socketNotification', 'emailNotification']);
+
                     }
                     res.status(200).send(JSON.stringify(data));
 

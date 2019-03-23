@@ -1,5 +1,5 @@
 const Imap = require('imap'),
-systemNotification = require('../../systemNotifications');
+systemNotification = require('../../notifications/systemNotifications');
 
 
 async function extractJSON(str) {

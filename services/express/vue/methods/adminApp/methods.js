@@ -61,6 +61,7 @@ object = {
                         {
                             "data": "categories.name",
                             "width": "5%",
+                            "name": "categories.name",
                             render: function (data, type, row) {
                                 if(row && row.categories && Array.isArray(row.categories) && row.categories.length > 0) {
                                     console.log('RAN F', row.categories)

@@ -29,15 +29,11 @@ async function populationDeep(options, populate) {
   return popArr
 }
 
-
-
 module.exports = {
 
   m_create: (model) => {
 
     return async (options, _cb) => {
-
-
 
       if (options) {
 
@@ -163,6 +159,8 @@ module.exports = {
         };
         await Functions.asyncForEach(Object.keys(options.query), async (value, index) => {
 
+     
+
           let noRun = false
           let promiseAll = [];
 
@@ -215,13 +213,28 @@ module.exports = {
           if (runFunction.schema.paths[value] && runFunction.schema.paths[value].instance === 'Array') {
 
 
-
             noRun = true
-            if (ObjectId.isValid(options.query[value])) {
-              or.$or.push({
-                [value]: options.query[value]
-              });
-            }
+            if(options.query[value].$in) {
+              or.$or.push({[value]: options.query[value]})
+            } else if(Array.isArray(options.query[value])) {
+
+            
+            await Functions.asyncForEach(options.query[value], (objectId) => {
+              console.log('DA FUCK....', objectId)
+              if (ObjectId.isValid(objectId)) {
+                or.$or.push({
+                  [value]: objectId
+                });
+              }
+
+            });
+
+          } else {
+            or.$or.push({[value]: options.query[value]})
+          }
+
+       
+
 
           }
 
@@ -242,6 +255,7 @@ module.exports = {
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
+          console.log(options.query)
           eval(model)[options.type](options.query)
             .skip(Number(options.perPage * options.page))
             .limit(Number(options.perPage))
