@@ -21,6 +21,8 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
  //  global.crud = require('./controllers/crud');
     require('./services/express/server');
 
+    require('./services/express/routes/mongooseAutomationRoutes');
+
  //   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
 
 

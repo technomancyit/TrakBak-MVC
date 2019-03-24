@@ -5,9 +5,8 @@ const fs = require('fs'),
     io = require('../../sockets/socket.io'),
     systemNotification = require('../../notifications/systemNotifications'),
     mongoose = require('mongoose'),
-    Notification = require('../../notifications/userNotification'),
     router = express.Router();
-passport = require('passport'),
+    passport = require('passport'),
     dir = __dirname,
     apiModels = `${path.join(dir, '../../../', 'apiModels')}`, {
         promisify
@@ -208,7 +207,6 @@ async function asyncRoute() {
                     let data = await models[filename][crud[i]](query).catch(e => console.log(e));
                     if (data && data.collectionSize) {
 
-                        console.log(data.collectionSize)
                         let collectionSize = data.collectionSize;
                         let recordsFiltered = data.searchCount ? data.searchCount : collectionSize
                         delete data.collectionSize;
@@ -231,7 +229,7 @@ async function asyncRoute() {
                         let sendData = data.data ? data.data : data;
                    //     systemNotification(filename, sendData);
 
-                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename]});
+                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename], sender:query.query.sender});
                         // notfication.socketNotification()
                         // notfication.emailNotification()
                         notfication.exec(['socketNotification', 'emailNotification']);
@@ -266,6 +264,8 @@ async function asyncRoute() {
 
         }
     });
+
+    const Notification = require('../../notifications/userNotification');
 
     server.use('/', router)
 }

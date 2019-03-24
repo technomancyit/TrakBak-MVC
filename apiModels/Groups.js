@@ -3,12 +3,31 @@ const mongoose = require('mongoose'),
     crud = require('../controllers/mongoose/crud'),
     bcrypt = require('bcrypt-nodejs');
 
-var GroupSchema = new mongoose.Schema({
-    name: { type: String, required: true, unique: true },
-    // groups: [{ type: mongoose.Schema.ObjectId, ref: 'Groups' }],
-    biography: String,
+var modelName = 'Groups';
+
+var schema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    categories: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Categories'
+    }],
+    notifications: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Notifications'
+    }],
+    users: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Users'
+    }],
+    status: {
+        type: Number,
+        default: 1
+    },
     permissions: Number,
-    profilePicture: Buffer,
     createdAt: {
         type: Date,
         default: Date.now
@@ -16,37 +35,40 @@ var GroupSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    },
-    passwordHash: { type: String, required: true },
+    }
 });
 
-GroupSchema.plugin(uniqueValidator);
+require('../controllers/mongoose/middleware/mongooseAutoMiddleware')(schema, modelName);
 
-var Groups = mongoose.model('Groups', GroupSchema);
+schema.plugin(uniqueValidator);
+var Model = mongoose.model(modelName, schema);
 
 let crudObj = {
-    m_read: crud.m_read(Groups),
-    m_create: crud.m_create(Groups)
+    m_create: crud.m_create(Model),
+    m_read: crud.m_read(Model),
+    m_update: crud.m_update(Model),
+    m_delete: crud.m_delete(Model)
 }
 
-Groups = Object.assign(Groups, crudObj);
+Model = Object.assign(Model, crudObj);
 
 const options = {
-    prefix : 'api',
+    prefix: 'api',
     routes: {
-        m_create: {
-        },
+        m_create: {},
         m_read: {
 
         },
         m_update: {
-            permissions: 1,
-            groups: ['administrators']
+
         },
         m_delete: {
-
+            permissions: 1
         }
     }
 }
 
-module.exports = { Groups, options };
+module.exports = {
+    [modelName]: Model,
+    options
+};

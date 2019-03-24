@@ -53,4 +53,4 @@ module.exports = {
     path: pathSet
 }
 
-require('./mongooseAutomationRoutes');
+// require('./mongooseAutomationRoutes');

@@ -10,8 +10,8 @@ require('../middleware/passport');
 
 
 
-routes.then((rf) => {
-    Object.keys(rf).forEach(async r => {
+routes.then(async (rf) => {
+    await Functions.asyncForEach(Object.keys(rf), async r => {
         if (!rf[r].type) rf[r].type = 'get';
         if (config.express.signUp && rf[r].path !== '/') {
             let permNumber = rf[r].permissions ? rf[r].permissions : 1;
