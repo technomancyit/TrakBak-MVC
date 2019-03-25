@@ -47,6 +47,7 @@ async function asyncRoute() {
                         page: Object.keys(req.query).length !== 0 && req.query.page && !req.query.start ? Number(req.query.page) - 1 : req.query.start ? req.query.start / req.query.length : undefined,
                         perPage: Object.keys(req.query).length !== 0 && req.query.perPage && !req.query.length ? req.query.perPage : req.query.length ? req.query.length : undefined,
                         populate: Object.keys(req.query).length !== 0 && req.query.populate ? req.query.populate : undefined,
+                        
                         socketInfo: Object.keys(req.query).length !== 0 && req.query.socketInfo ? req.query.socketInfo : req.body.socketInfo ? req.body.socketInfo : {
                             script: "socketPush",
                             room: req.query.room ? req.query.room : req.body.room,
@@ -229,7 +230,7 @@ async function asyncRoute() {
                         let sendData = data.data ? data.data : data;
                    //     systemNotification(filename, sendData);
 
-                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename], sender:query.query.sender});
+                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename], sender:query.query.sender, route:types[i]});
                         // notfication.socketNotification()
                         // notfication.emailNotification()
                         notfication.exec(['socketNotification', 'emailNotification']);

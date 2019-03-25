@@ -15,6 +15,7 @@ const express = require('express'),
         Users
     } = require('../../../apiModels/Users'),
     router = express.Router()
+    const Notification = require('../../notifications/userNotification');
 
 let verifier = new Verifier("at_VLZKJ87dDSp9lQEGjMGPzW71bh4f8");
 
@@ -92,8 +93,9 @@ router.route(pathSet).post(async (req, res) => {
 
         if (ticket) {
 
-            systemNotification('Tickets', ticket);
-
+        //    systemNotification('Tickets', ticket);
+        let notfication = new Notification(ticket, 'This is the notification', {recipients:['test','chad'], model:models.Tickets, sender, route:'post'});
+        notfication.exec(['socketNotification', 'emailNotification']);
             switch (req.body.template) {
                 case "general":
                     await mailer({

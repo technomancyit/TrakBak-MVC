@@ -40,7 +40,7 @@ module.exports = (auth, options) => {
 
   imap.once("ready", execute);
   imap.once("error", function (err) {
-    log.error("Connection error: " + err.stack);
+   console.error("Connection error: " + err.stack);
   });
 
   imap.connect();

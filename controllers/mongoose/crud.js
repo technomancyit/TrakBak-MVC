@@ -5,6 +5,8 @@ async function populationDeep(options, populate) {
   var popDeep = options.deep ? options.deep : populate;
   var popArr = []
 
+  console.log('DEEEEEP', popDeep)
+
   if (popDeep) {
     await Functions.asyncForEach(populate.split(" "), async (pop) => {
       if (pop !== '')
@@ -23,8 +25,13 @@ async function populationDeep(options, populate) {
             select
           });
         }
-    })
+    });
+
+   
   }
+
+
+  console.log('awr', popArr);
 
   return popArr
 }

@@ -9,12 +9,12 @@ var schema = new mongoose.Schema({
         type: Number,
         requred: true
     },
-    objectName: {
-        type: String
-    },
     actions: {
         type: Object,
         required: true
+    },
+    templates: {
+        type: Object
     },
     creator: {
         type: mongoose.Schema.ObjectId,
