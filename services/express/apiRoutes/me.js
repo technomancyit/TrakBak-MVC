@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express'),
     server = require('../server').app,
     passport = require('passport'),

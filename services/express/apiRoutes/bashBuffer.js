@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express'),
     server = require('../server').app,
     router = express.Router(),
@@ -43,11 +45,11 @@ router.route(pathSet).post(async (req, res) => {
 
         mailer({ subject: "Please verify email address.", from: config.mail.user, to: user.email }, {
             name: 'emailVerification',
-            replace: [
-                { server: "Super Bashbots" },
-                { link: `${hostname}/auth/?verify=${randomKey}&lookup=${user._id}` },
-                { user: user.account }
-            ]
+            replace: 
+                { server: "Super Bashbots",
+                link: `${hostname}/auth/?verify=${randomKey}&lookup=${user._id}`,
+                user: user.account }
+            
         });
 
         res.send(JSON.stringify(data))

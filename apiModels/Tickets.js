@@ -1,3 +1,5 @@
+'use strict';
+
 const mongoose = require('mongoose'),
     uniqueValidator = require("mongoose-unique-validator"),
     crud = require('../controllers/mongoose/crud'),

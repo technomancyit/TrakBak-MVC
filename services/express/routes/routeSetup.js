@@ -1,6 +1,8 @@
+'use strict';
+
 const fs = require('fs'),
     { promisify } = require('util'),
-    rfs = require('require-from-string');
+    rfs = require('require-from-string'),
     dir = __dirname;
 
 fs.readdir = promisify(fs.readdir);

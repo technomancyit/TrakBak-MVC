@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = (permissions) => {
     
     return async function (req, res, next) {

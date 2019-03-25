@@ -1,3 +1,5 @@
+'use strict';
+
 const passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     passportJWT = require("passport-jwt"),

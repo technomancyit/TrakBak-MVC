@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * plotly.js v1.44.3
 * Copyright 2012-2019, Plotly, Inc.

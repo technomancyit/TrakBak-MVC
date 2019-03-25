@@ -1,3 +1,5 @@
+'use strict';
+
 //import { setTimeout } from "timers";
 
 let cpu = []

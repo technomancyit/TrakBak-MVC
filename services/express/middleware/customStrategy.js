@@ -1,5 +1,7 @@
+'use strict';
 
-JWTStrategy = require("passport-jwt").Strategy,
+
+const JWTStrategy = require("passport-jwt").Strategy,
   jwt = require('jwt-simple');
 
 

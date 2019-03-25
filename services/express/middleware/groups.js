@@ -1,3 +1,5 @@
+'use strict';
+
 //const Groups = require('../../../models/mgSync/Groups');
 
 module.exports = (groups) => {

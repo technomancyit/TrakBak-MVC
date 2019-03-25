@@ -1,3 +1,5 @@
+'use strict';
+
 "use strict";
 const nodemailer = require("nodemailer"),
   asyncForEach = require('../../functions/asyncForEach'),
@@ -20,9 +22,9 @@ class MailOptions {
   async sendMail(transporter, obj) {
     let object = this;
     if (obj) object = obj
-    let info = await transporter.sendMail(object);
+    let info = await transporter.sendMail(object).catch(e => e);
 
-    console.log("Message sent: %s", info.messageId);
+    if(info.messageId) console.log("Message sent: %s", info.messageId);
   }
 
 }
@@ -37,7 +39,8 @@ async function templateBuild(templateName, template, count) {
   let replaceValues = {};
   if (typeof template === "object") {
 
-    await asyncForEach(template.replace, (obj, index) => {
+    await asyncForEach(Object.keys(template.replace), (key) => {
+      let obj = {[key]:[template.replace[key]]}
       regEx.push(`{{${Object.keys(obj)}}}`);
       if (!Array.isArray(obj[Object.keys(obj)])) obj[Object.keys(obj)] = [obj[Object.keys(obj)]];
       replaceValues[`{{${Object.keys(obj)}}}`] = obj[Object.keys(obj)][count];

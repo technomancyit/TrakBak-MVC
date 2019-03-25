@@ -1,3 +1,5 @@
+'use strict';
+
 const defaultGateway = require('default-gateway');
 function gateway() {
   return new Promise(async (resolve) => {

@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express'),
     server = require('../server').app,
     mysqlPassword = require('mysql-password'),
@@ -37,11 +39,11 @@ router.route(pathSet).post(async (req, res, next) => {
 
             await mailer({ subject: "Please verify email address.", from: config.mail.user, to: user.email }, {
                 name: 'emailVerification',
-                replace: [
-                    { server: "Super Bashbots" },
-                    { link: `${hostname}?verify=${newRegistrationToken}&lookup=${user.email}` },
-                    { user: user.account }
-                ]
+                replace: 
+                    { server: "Super Bashbots",
+                     link: `${hostname}?verify=${newRegistrationToken}&lookup=${user.email}`,
+                     user: user.account }
+                
             });
 
             res.status(200).send(JSON.stringify({
@@ -89,11 +91,11 @@ router.route(pathSet).post(async (req, res, next) => {
 
                 await mailer({ subject: "Please verify email address.", from: config.mail.user, to: user.email }, {
                     name: 'emailVerification',
-                    replace: [
-                        { server: "Super Bashbots" },
-                        { link: `${hostname}/auth/?verify=${newRegistrationToken}&lookup=${user._id}` },
-                        { user: user.account }
-                    ]
+                    replace:
+                        { server: "Super Bashbots" ,
+                         link: `${hostname}/auth/?verify=${newRegistrationToken}&lookup=${user._id}` ,
+                         user: user.account }
+                    
                 });
 
                 return user;

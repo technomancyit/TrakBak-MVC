@@ -1,3 +1,5 @@
+'use strict';
+
 const chalk = require('chalk'),
     objClone = require('./objClone'),
     fs = require('fs'),
@@ -18,7 +20,7 @@ fs.writeFile = promisify(fs.writeFile);
 //type, close, log
 let messenger = async (options, values, extras) => {
 
-    logWrite = new Promise( async (resolve) => {
+    new Promise( async (resolve) => {
 
     if (values && !Array.isArray(values)) extras = values;
     var dt = new Date();

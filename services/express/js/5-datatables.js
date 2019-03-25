@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * MDBootstrap integration with Datatables
  * Learn more: https://mdbootstrap.com/docs/jquery/tables/datatables/

@@ -1,5 +1,8 @@
+'use strict';
+
+"use strict";
 const express = require('express'),
-    mongoose = require('mongoose')
+    mongoose = require('mongoose'),
     models = mongoose.models,
     systemNotification = require('../../notifications/systemNotifications'),
     server = require('../server').app,
@@ -15,7 +18,7 @@ const express = require('express'),
         Users
     } = require('../../../apiModels/Users'),
     router = express.Router()
-    const Notification = require('../../notifications/userNotification');
+const Notification = require('../../notifications/userNotification');
 
 let verifier = new Verifier("at_VLZKJ87dDSp9lQEGjMGPzW71bh4f8");
 
@@ -69,7 +72,8 @@ router.route(pathSet).post(async (req, res) => {
                 sender,
                 ticket: ticketID,
                 text: req.body.message
-            },noNotification: true
+            },
+            noNotification: true
         }).catch(e => console.log(e));
 
         let socketInfo = {
@@ -93,9 +97,14 @@ router.route(pathSet).post(async (req, res) => {
 
         if (ticket) {
 
-        //    systemNotification('Tickets', ticket);
-        let notfication = new Notification(ticket, 'This is the notification', {recipients:['test','chad'], model:models.Tickets, sender, route:'post'});
-        notfication.exec(['socketNotification', 'emailNotification']);
+            systemNotification('Tickets', ticket);
+            let notfication = new Notification(ticket, 'This is the notification', {
+                recipients: ['test', 'chad'],
+                model: models.Tickets,
+                sender,
+                route: 'post'
+            });
+            notfication.exec(['socketNotification', 'emailNotification']);
             switch (req.body.template) {
                 case "general":
                     await mailer({
@@ -103,23 +112,14 @@ router.route(pathSet).post(async (req, res) => {
                         from: config.mail.user,
                         to: req.body.email
                     }, {
-                        name: 'general',
-                        replace: [{
-                                server: "TechnomancyIT"
-                            },
-                            {
-                                link: `${hostname}/ticket/?vreply=${ticket._id}`
-                            },
-                            {
-                                user: req.body.name
-                            },
-                            {
-                                id: ticketID
-                            },
-                            {
-                                msgId: messageID
-                            }
-                        ]
+                        name: 'emailTicket',
+                        replace: {
+                            server: "TechnomancyIT",
+                            link: `${hostname}/ticket/?vreply=${ticket._id}`,
+                            user: req.body.name,
+                            id: ticketID,
+                            msgId: messageID
+                        }
                     });
                     break;
 
@@ -139,8 +139,6 @@ router.route(pathSet).post(async (req, res) => {
         return res.status(404).send(JSON.stringify(error));
 
     }
-
- 
 
     return res.status(200).send(JSON.stringify({}));
 

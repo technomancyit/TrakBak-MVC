@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express'),
     routes = require('./routeSetup'),
     passport = require('passport'),

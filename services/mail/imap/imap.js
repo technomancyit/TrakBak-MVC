@@ -1,3 +1,5 @@
+'use strict';
+
 const Imap = require('imap'),
 systemNotification = require('../../notifications/systemNotifications');
 

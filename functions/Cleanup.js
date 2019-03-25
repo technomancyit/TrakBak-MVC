@@ -1,3 +1,5 @@
+'use strict';
+
 // Object to capture process exits and call app specific cleanup function
 
 function noOp() {};

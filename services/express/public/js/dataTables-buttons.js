@@ -1,3 +1,5 @@
+'use strict';
+
 /*!
  Buttons for DataTables 1.5.6
  ©2016-2019 SpryMedia Ltd - datatables.net/license

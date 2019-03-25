@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express'),
     server = require('../server').app,
     Users = require('../../../apiModels/Users'),
@@ -56,12 +58,12 @@ router.route('').post(async (req, res) => {
 
             mailer({ subject: "Password request link", from: config.mail.user, to: email[0].email }, {
                 name: 'passwordReset',
-                replace: [
-                    { server: "Mog Garden" },
-                    { link: `${hostname}/?rp=${jwtToken}` },
-                    { link2: `${hostname}/didnotrequest/${jwtToken}` },
-                    { user: req.body.login }
-                ]
+                replace:{
+                     server: "Mog Garden" ,
+                     link: `${hostname}/?rp=${jwtToken}` ,
+                     link2: `${hostname}/didnotrequest/${jwtToken}` ,
+                     user: req.body.login }
+                
             });
         }
 

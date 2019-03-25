@@ -1,3 +1,5 @@
+'use strict';
+
 let dir = __dirname,
     fs = require('fs'),
     cssFiles = fs.readdirSync(`${dir}/scss`),

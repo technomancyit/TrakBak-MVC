@@ -1,3 +1,5 @@
+'use strict';
+
 //The system notification mailer... Not recommended to use vs database notification system. (Users can't turn this off or format it to their needs)  Also requires entry for each model. or else crashes can happen.
 
 //Really should be used for outside account notifications. (Emails that do not reside as users within application)
@@ -39,34 +41,18 @@ module.exports = async (modelName, doc) => {
             to: emails
         }, {
             name: 'newTicket',
-            replace: [{
-                    server: "TechnomancyIT"
-                },
-                {
-                    link: object.link
-                },
-                {
-                    user: users
-                },
-                {
-                    ticketMessage: object.msg
-                },
-                {
-                    ticketNumber: object.ticketNumber
-                },
-                {
-                    ticketSubject: object.subject
-                },
-                {
-                    fromEmail: object.email
-                },
-                {
-                    fromName: object.from
-                },
-                {
-                    type: object.type
-                }
-            ]
+            replace: {
+                server: "TechnomancyIT",
+                link: object.link,
+                user: users,
+                ticketMessage: object.msg,
+                ticketNumber: object.ticketNumber,
+                ticketSubject: object.subject,
+                fromEmail: object.email,
+                fromName: object.from,
+                type: object.type
+            }
+
         });
     }
 

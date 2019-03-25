@@ -1,3 +1,5 @@
+'use strict';
+
 //These are schemas that the system automatically loads into models and routes within the application. It will pick the schema name and the prefix to determine which routes the models are attached too.
 
 const mongoose = require('mongoose'),

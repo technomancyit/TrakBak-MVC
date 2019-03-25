@@ -1,3 +1,5 @@
+'use strict';
+
 async function average(arr) {
 
     let total = 0;

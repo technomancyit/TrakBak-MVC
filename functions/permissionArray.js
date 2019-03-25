@@ -1,3 +1,5 @@
+'use strict';
+
 function permArray(num){
     var binaries = num.toString(2);
 var binaryArray = {}

@@ -1,3 +1,5 @@
+'use strict';
+
 const ip = require('public-ip');
 
 function publicIp() {

@@ -1,3 +1,5 @@
+'use strict';
+
 global.log = require('./functions/messenger');
 global.config = require('./config/scripts/config');
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();

@@ -1,3 +1,5 @@
+'use strict';
+
 /*!
  * Vue.js v2.6.2
  * (c) 2014-2019 Evan You

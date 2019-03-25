@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs'),
     path = require('path'),
     express = require('express'),
@@ -5,23 +7,20 @@ const fs = require('fs'),
     io = require('../../sockets/socket.io'),
     systemNotification = require('../../notifications/systemNotifications'),
     mongoose = require('mongoose'),
-    router = express.Router();
+    router = express.Router(),
     passport = require('passport'),
     dir = __dirname,
-    apiModels = `${path.join(dir, '../../../', 'apiModels')}`, {
+    apiModels = `${path.join(dir, '../../../', 'apiModels')}`,
+    {
         promisify
-    } = require('util');
-
-const modelFiles = fs.readdirSync(apiModels);
+    } = require('util'),
+    modelFiles = fs.readdirSync(apiModels);
 
 let models = mongoose.models,
-
     secondarySearch = [],
-
     types = ['post', 'get', 'put', 'delete'],
-    crud = ['m_create', 'm_read', 'm_update', 'm_delete'];
-
-rf = [];
+    crud = ['m_create', 'm_read', 'm_update', 'm_delete'],
+    rf = [];
 
 async function asyncRoute() {
 
@@ -39,7 +38,7 @@ async function asyncRoute() {
             let route = {
 
                 route: async (req, res) => {
-                      
+
                     res.setHeader('Content-Type', 'application/json');
 
                     let options = {
@@ -47,7 +46,7 @@ async function asyncRoute() {
                         page: Object.keys(req.query).length !== 0 && req.query.page && !req.query.start ? Number(req.query.page) - 1 : req.query.start ? req.query.start / req.query.length : undefined,
                         perPage: Object.keys(req.query).length !== 0 && req.query.perPage && !req.query.length ? req.query.perPage : req.query.length ? req.query.length : undefined,
                         populate: Object.keys(req.query).length !== 0 && req.query.populate ? req.query.populate : undefined,
-                        
+
                         socketInfo: Object.keys(req.query).length !== 0 && req.query.socketInfo ? req.query.socketInfo : req.body.socketInfo ? req.body.socketInfo : {
                             script: "socketPush",
                             room: req.query.room ? req.query.room : req.body.room,
@@ -133,15 +132,15 @@ async function asyncRoute() {
                     }
 
                     await Functions.asyncForEach(Object.keys(query.query), async (key) => {
-        
+
                         var popSearch = key.split('.');
                         var value = query.query[key];
 
 
                         if (popSearch.length > 1) {
 
-                 
-                          
+
+
                             modelName = file.slice(0, -3);
 
                             let ref = Array.isArray(model[modelName].schema.paths[popSearch[0]].options.type) ?
@@ -162,33 +161,33 @@ async function asyncRoute() {
                                 },
                                 pOptions);
 
-                              
-                            
+
+
                             let lookup = await models[ref].m_read(
                                 combine
                             ).catch(e => console.log(e));
 
-                     
-                         //   console.log('SR', lookup)
+
+                            //   console.log('SR', lookup)
                             if (lookup && !Array.isArray(lookup) || Array.isArray(lookup) && lookup.length !== 0) {
                                 delete query.query[key];
                                 let ids = {
                                     $in: []
                                 }
 
-                                if(Array.isArray(lookup) && lookup.length > 1) { 
-                                await Functions.asyncForEach(lookup, (doc) => {
-                                    ids.$in.push(mongoose.Types.ObjectId(doc._id))
-                                });
-                            }
+                                if (Array.isArray(lookup) && lookup.length > 1) {
+                                    await Functions.asyncForEach(lookup, (doc) => {
+                                        ids.$in.push(mongoose.Types.ObjectId(doc._id))
+                                    });
+                                }
 
-                               
+
 
                                 query.query[popSearch[0]] = ids.$in.length === 0 ? lookup[0]._id : ids;
-                        
-                              
-                               
-                           //     query.query.categories = mongoose.Types.ObjectId(lookup[0]._id);
+
+
+
+                                //     query.query.categories = mongoose.Types.ObjectId(lookup[0]._id);
 
                                 if (query.sort === key) {
                                     query.sort = popSearch[0];
@@ -203,16 +202,12 @@ async function asyncRoute() {
 
                     });
 
-           //         console.log('DA FUCK', query.query)
-
                     let data = await models[filename][crud[i]](query).catch(e => console.log(e));
                     if (data && data.collectionSize) {
 
                         let collectionSize = data.collectionSize;
                         let recordsFiltered = data.searchCount ? data.searchCount : collectionSize
                         delete data.collectionSize;
-
-                        
 
                         let dataTableObj = {
                             data: data,
@@ -226,11 +221,17 @@ async function asyncRoute() {
                     } else if (!data) {
                         data = {};
                     }
-                    if (types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
-                        let sendData = data.data ? data.data : data;
-                   //     systemNotification(filename, sendData);
 
-                        let notfication = new Notification(data, 'This is the notification', {recipients:['test','chad'], model:models[filename], sender:query.query.sender, route:types[i]});
+                    if (Object.keys(data).length !== 0 && !data.err && types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
+                        let sendData = data.data ? data.data : data;
+                        systemNotification(filename, sendData);
+
+
+                        let notfication = new Notification(sendData, 'This is the notification', {
+                            model: models[filename],
+                            sender: query.query.sender ? query.query.sender : undefined,
+                            route: types[i]
+                        });
                         // notfication.socketNotification()
                         // notfication.emailNotification()
                         notfication.exec(['socketNotification', 'emailNotification']);

@@ -1,3 +1,5 @@
+'use strict';
+
 function removeA(arr) {
     var what, a = arguments, L = a.length, ax;
     while (L > 1 && arr.length) {

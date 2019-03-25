@@ -1,3 +1,5 @@
+'use strict';
+
 let dir = __dirname,
     fs = require('fs'),
     javascriptFiles = fs.readdirSync(`${dir}/js`),

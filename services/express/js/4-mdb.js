@@ -1,3 +1,5 @@
+'use strict';
+
 /*!
  * Material Design for Bootstrap 4
  * Version: MDB FREE: 4.7.1

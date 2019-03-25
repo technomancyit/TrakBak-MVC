@@ -1,4 +1,6 @@
-mongoose = require('mongoose');
+'use strict';
+
+const mongoose = require('mongoose');
 
 module.exports = (model, modelName) => {
 

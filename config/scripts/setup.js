@@ -1,3 +1,5 @@
+'use strict';
+
 const inquirer = require('inquirer'),
   chalk = require('chalk'),
   path = require('path'),
