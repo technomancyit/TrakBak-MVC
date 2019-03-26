@@ -32,6 +32,9 @@ class MailOptions {
 //function for template building
 
 async function templateBuild(templateName, template, count) {
+
+
+
   if (!count) count = 0;
   let attachments = [];
   let contents = await fs.readFileSync(`${__dirname}/templates/${templateName}/template.html`, "utf8");
@@ -54,8 +57,11 @@ async function templateBuild(templateName, template, count) {
   let imgs = contents.match(/(<img \S([^>]+)>)/g);
   let matches = []
   if (Array.isArray(imgs)) {
-    imgs.forEach(img => {
-      let src = img.match(/src=[\"|\'](?!https?:\/\/)([^\/].+?)[\"|\']/)[0];
+    await Functions.asyncForEach(imgs, async img => {
+      let src = await img.match(/src=[\"|\'](?!https?:\/\/)([^\/].+?)[\"|\']/);
+      if(!src) return;
+
+      src = src[0];
       src = src.substring(5, src.length - 1);
       let filename = src;
       let path = `${__dirname}/templates/${templateName}/${src}`;

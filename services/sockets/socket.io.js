@@ -96,12 +96,11 @@ module.exports = class Sockets {
         let type = options.type ? options.type : 'in';
 
         if(type === 'in') {
-            console.log('RANz', type, options.room, options.script)
+
             this.io[type](options.room).emit(options.script, data);
         } else {
             socket.broadcast[type](options.room).emit(options.script, data);
         }
-
 
         // this.io.in('5c85bb2357ebf780410768c3').emit('joinRoom', 'the game will start soon');
 
@@ -109,9 +108,6 @@ module.exports = class Sockets {
         //    this.io.in(page).emit(script, data);
         // socket.emit(script, data);
     }
-
-
-
 
     async socketOn(name, options) {
         this.io.on('connection', (socket) => {

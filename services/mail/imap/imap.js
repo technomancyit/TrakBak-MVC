@@ -1,7 +1,9 @@
 'use strict';
 
 const Imap = require('imap'),
-systemNotification = require('../../notifications/systemNotifications');
+systemNotification = require('../../notifications/systemNotifications'),
+mongoose = require('mongoose'),
+models = mongoose.models;
 
 
 async function extractJSON(str) {
@@ -48,6 +50,9 @@ module.exports = (auth, options) => {
   imap.connect();
 
   function execute() {
+
+    const Notification = require('../../notifications/userNotification');
+
     imap.openBox(options.folder ? options.folder : 'INBOX', false, function (err, mailBox) {
       if (err) {
         console.error(err);
@@ -93,7 +98,7 @@ module.exports = (auth, options) => {
                 let reg = new RegExp(`Content-Transfer-Encoding(.|\n|\r)+${auth.user}`, 'i');
                 let findText = text.match(reg);
                 
-                object = await extractJSON(text);
+                let object = await extractJSON(text);
 
                 object = object[0];
 
@@ -146,7 +151,18 @@ module.exports = (auth, options) => {
                 socketInfo,
                 populate: 'sender'
               }).catch(e => console.log(e));
+
               systemNotification('Messages', messageDoc.data);
+
+              let notification = new Notification(messageDoc.data, message.text, {
+                model: models.Messages,
+                sender: user,
+                route: 'post'
+            });
+            // notfication.socketNotification()
+            // notfication.emailNotification()
+            notification.exec(['socketNotification', 'emailNotification']);
+
             }
 
             imap.seq.move(seqno, 'processed', (err, data) => {

@@ -3,7 +3,6 @@
 const mongoose = require('mongoose'),
     mailer = require('../mail/mailer'),
     Notifications = mongoose.models.Notifications;
-
 class Notification {
 
     constructor(doc, text, options) {
@@ -23,12 +22,35 @@ class Notification {
 
     }
 
-    async socketNotification(doc) {
+    async emailVariables(template, doc) {
+
+        if(!template) return;
+
+        let newTemplate = {};
+
+        await Functions.asyncForEach(Object.keys(template), async key => {
+            
+                if(key === 'table') newTemplate[key] = doc.variables.table;
+                if(key === 'item') newTemplate[key] = doc.variables.item ? doc.variables.item : doc.variables.table; 
+                if(key === 'id') newTemplate[key] = doc.variables.id;
+                if(key === 'objId') newTemplate[key] = doc.variables.msgId;
+                if(key === 'server') newTemplate[key] = 'TechnomancyIT';
+                if(key === 'user') newTemplate[key] = doc.user.account;
+                if(key === 'link') newTemplate[key] = doc.variables.link;
+                if(key === 'text') newTemplate[key] = doc.variables.table === "Tickets" 
+                ? !doc.owner ? `There was a new message added on ticket# ${doc.variables.id}.<br>User ${this.sender.account} has sent this message:<br>${this.text}`:
+                `There was a new message added on your ticket# ${doc.variables.id}.<br>User ${this.sender.account} has sent this message:<br>${this.text}`
+                : doc.table === "Messages" 
+                ? "This is what you say about messages" : "Can't find?"
+        });
+
+        return newTemplate;
+        
+    }
+
+    async socketNotification(doc, variables) {
 
         this.promises.push(new Promise(async (resolve, reject) => {
-
-
-
 
             resolve({
                 sockets: doc
@@ -38,26 +60,28 @@ class Notification {
 
     }
 
-    async emailNotification(doc) {
+    async emailNotification(doc, other) {
+        let name;
+        if(doc.owner && doc.templates) {
+            name = doc.templates.owner
+        } else {
+            name = doc.templates.everyone
+        }
 
-        console.log(doc.user.email)
+        let push = Object.assign(doc, other);
+
+        var replace = await this.emailVariables(config.mail.templates[name], push);
+    
         this.promises.push(new Promise(async (resolve, reject) => {
-
-
             mailer({
-                subject: "Recieved your request. You may email back to this",
+                subject: `An update in ${other.variables.table} on item ${other.variables.item} has happened.`,
                 from: config.mail.user,
                 to: doc.user.email
             }, {
-                name: 'general',
-                replace: { 
-                    server: "TechnomancyIT",
-                    link: `${hostname}/ticket/?vreply=`,
-                    user: doc.user.account,
-                    id: 'Ticket ID goes here'
-                }
+                name,
+                replace
 
-            })
+            });
 
             resolve({
                 emails: doc
@@ -93,26 +117,36 @@ class Notification {
             }
         }).catch(e => console.log(e));
 
-        let users = {};
+        let users = {
+            variables: {
+
+            },
+            sender:this.doc.sender
+        };
         let global = [];
         if (layerOne) {
 
             layerOne.forEach((notification) => {
-
+             
                 if (notification.actions[this.model.modelName]) {
+                    users.variables.table = this.model.modelName;
+     
+                    users.variables.id = this.doc._id;
                     // if(!users[this.doc.owner]) users[this.doc.owner] = {owner:true}
                     // users[this.doc.owner] = this.doc.owner !== this.sender ? users[this.doc.owner].status = true :  users[this.doc.owner].status = false;
                     notification.groups.forEach(group => {
 
-
-
-                        if (notification.actions[this.route] || notification.actions.all) group.users.forEach(user => users[user._id] =
-                            this.sender !== user._id &&
-                            !users[user._id] &&
+                        if (notification.actions[this.route] || notification.actions.all) group.users.forEach(user => users[user._id.toString()] =
+                            this.sender._id.toString() !== user._id.toString() &&
+                            !users[user._id.toString()] &&
                             notification.actions[typeArr[0]] ||
+                            this.sender._id.toString() !== user._id.toString() &&
+                            !users[user._id.toString()] &&
                             notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] ||
-                            this.sender !== user._id &&
-                            notification.actions[typeArr[0]] ||
+                            this.sender._id.toString() !== user._id.toString() &&
+                            notification.actions[typeArr[0]] &&
+                            users[user.id.toString()].status === true ||
+                            this.sender._id.toString() !== user._id.toString() &&
                             notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] &&
                             users[user._id].status === true ? {
                                 user,
@@ -134,10 +168,8 @@ class Notification {
         }
 
         //This is how it finds secondary notification objects (Certain objects dont have user information attached to them, so the system needs to find the parent to find the owner and anyone else that may have accesss)
-        console.log(this.doc)
-
-
         var _id = this.doc.type ? this.doc[this.doc.type] : this.doc._id;
+        
         let pathName = this.doc.type;
         let modelName, object;
         if (pathName && this.model.schema.paths[pathName]) {
@@ -153,17 +185,12 @@ class Notification {
                 }
             });
         }
-        console.log('RUNNING', {
-            query: {
-                _id
-            },
-            type: 'findById',
-            populate: 'categories owner',
-            deep: {
-                categories: 'groups'
-            }
-        })
+
         if (object) {
+            users.variables.id = object._id;
+            users.variables.msgId = this.doc._id;
+
+            
 
             //  if(!users[object.owner]) users[object.owner] = {owner:true}
 
@@ -184,19 +211,24 @@ class Notification {
                 layerTwo.forEach((notification) => {
 
                     if (notification.actions[modelName]) {
+                        users.variables.table = modelName;
+                        users.variables.item = this.model.modelName;
                         notification.groups.forEach(group => {
 
                             if (notification.actions[this.route] ||
-                                notification.actions.all) group.users.forEach(user => users[user._id] =
-                                this.sender !==
-                                user._id &&
-                                !users[user._id] &&
-                                notification.actions[typeArr[0]] ||
-                                notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] ||
-                                this.sender !== user._id &&
-                                notification.actions[typeArr[0]] ||
-                                notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] &&
-                                users[user.id].status === true ? {
+                                notification.actions.all) group.users.forEach(user => users[user._id.toString()] =
+                                    this.sender._id.toString() !== user._id.toString() &&
+                                    !users[user._id.toString()] &&
+                                    notification.actions[typeArr[0]] ||
+                                    this.sender._id.toString() !== user._id.toString() &&
+                                    !users[user._id.toString()] &&
+                                    notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] ||
+                                    this.sender._id.toString() !== user._id.toString() &&
+                                    notification.actions[typeArr[0]] &&
+                                    users[user.id.toString()].status === true ||
+                                    this.sender._id.toString() !== user._id.toString() &&
+                                    notification.actions[typeArr[1] ? typeArr[1] : typeArr[0]] &&
+                                    users[user.id.toString()].status === true ? {
                                     user,
                                     templates: {
                                         owner: notification.templates.owner,
@@ -216,16 +248,16 @@ class Notification {
             }
 
             //This is the third layer (User layer) any global notiifcations will be replaced with user defaults.
-            console.log('DA FUCK')
+
             await Functions.asyncForEach(Object.keys(mongoose.models[modelName].schema.paths), async (key) => {
-                console.log('DA FUCKzz')
+
                 let schema = mongoose.models[modelName].schema.paths[key];
                 let ref = schema.options.type && schema.options.type[0] ? schema.options.type[0].ref : schema.options.ref;
 
                 //this finds the owner
                 let notification = layerOne ? layerOne[0] : layerTwo[0];
-                console.log(this.sender, ' ', key, ' ', object[key]._id, (ref === 'Users' && this.sender.toString() !== object[key]._id.toString()));
-                if (ref === 'Users' && this.sender.toString() !== object[key]._id.toString()) users[object[key]._id.toString()] = {
+
+                if (ref === 'Users' && this.sender._id.toString() !== object[key]._id.toString()) users[object[key]._id.toString()] = {
                     user: object[key],
                     status: true,
                     owner: true,
@@ -240,7 +272,7 @@ class Notification {
                 }
 
                 if (ref === 'Categories') object[key].forEach(categories => {
-                    categories.groups.forEach(group => console.log(group.users))
+                  //  categories.groups.forEach(group => console.log(group.users))
                 });
 
             });
@@ -250,6 +282,7 @@ class Notification {
             }
 
         }
+
         this.notifications = users;
         return users;
 
@@ -258,14 +291,24 @@ class Notification {
     async exec(functions) {
 
         let notifications = await this.findNotifications('both');
-        console.log('LOL', notifications)
+ 
         if (notifications) {
+
+            let seperate = {
+                sender: notifications.sender,
+                variables: notifications.variables
+            }
+
+            delete notifications.sender;
+            delete notifications.variables;
 
             Object.keys(notifications).forEach(async (key) => {
                 let value = notifications[key];
 
-                if (value.sockets && functions.includes('socketNotification')) this.socketNotification(value);
-                if (value.email && functions.includes('emailNotification')) this.emailNotification(value);
+               
+
+                if (value.sockets && functions.includes('socketNotification')) this.socketNotification(value, seperate);
+                if (value.email && functions.includes('emailNotification')) this.emailNotification(value, seperate);
 
             });
 

@@ -3,7 +3,7 @@
 function permArray(num){
     var binaries = num.toString(2);
 var binaryArray = {}
-for (i = 1; i <= binaries.length; i++) {
+for (let i = 1; i <= binaries.length; i++) {
 
   var binary = binaries.substr(binaries.length - i);
   var boolean = !!+binary.charAt(0);

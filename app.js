@@ -3,7 +3,12 @@
 global.log = require('./functions/messenger');
 global.config = require('./config/scripts/config');
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
-let imap = require('./services/mail/imap/imap');
+
+
+
+const repeat = require('repeat').default,
+    CronJob = require('cron').CronJob,
+    imap = require('./services/mail/imap/imap');
 
 
 Promise.all(require('./config/scripts/config').doneArray).then((data) => {
@@ -20,16 +25,28 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
     }
 
     require('./controllers/mongoose/mongoose');
- //  global.crud = require('./controllers/crud');
+    //  global.crud = require('./controllers/crud');
     require('./services/express/server');
 
     require('./services/express/routes/mongooseAutomationRoutes');
 
- //   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
+    //   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'});
 
+    let job = new CronJob('*/10 * * * * *', function () {
+        imap({
+            tls: true,
+            host: config.mail.host,
+            user: config.mail.user,
+            password: config.mail.pass,
+            port: 993
+        }, {
+            folder: 'autoTicket'
+        })
+    }, null, true, 'America/Denver');
 
-    setTimeout(function(){   imap({tls:true,host:config.mail.host, user:config.mail.user, password:config.mail.pass, port:993},{folder:'autoTicket'}); }, 6000);
+    job.start();
+
+    console.log(job._callbacks[0].toString());
 
 
 });
-

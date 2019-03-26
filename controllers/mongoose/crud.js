@@ -7,8 +7,6 @@ async function populationDeep(options, populate) {
   var popDeep = options.deep ? options.deep : populate;
   var popArr = []
 
-  console.log('DEEEEEP', popDeep)
-
   if (popDeep) {
     await Functions.asyncForEach(populate.split(" "), async (pop) => {
       if (pop !== '')
@@ -32,9 +30,6 @@ async function populationDeep(options, populate) {
    
   }
 
-
-  console.log('awr', popArr);
-
   return popArr
 }
 
@@ -53,10 +48,7 @@ module.exports = {
           delete options.populate;
         }
 
-
         var popArr = await populationDeep(options, populate);
-
-
 
         if (options.body) options.query = options.body;
         if (!options.type) options.type = 'create';
@@ -64,9 +56,6 @@ module.exports = {
         model.lastQuery = options.query;
         if (!_cb) {
           return new Promise(async (resolve, reject) => {
-
-
-
             await eval(model)[options.type](options.query, async function (err, data) {
               if (err)
                 return reject({
@@ -75,10 +64,7 @@ module.exports = {
 
               if (popArr.length > 0) {
 
-
                 await Functions.asyncForEach(popArr, async (pop) => {
-
-
 
                   let popRef = model.schema.paths[pop.path].options.ref;
 
@@ -89,7 +75,6 @@ module.exports = {
                   }).catch(e => console.log(e));
 
                   data._doc[pop.path] = poop;
-
 
                 });
               }
@@ -225,11 +210,8 @@ module.exports = {
             noRun = true
             if(options.query[value].$in) {
               or.$or.push({[value]: options.query[value]})
-            } else if(Array.isArray(options.query[value])) {
-
-            
+            } else if(Array.isArray(options.query[value])) {       
             await Functions.asyncForEach(options.query[value], (objectId) => {
-              console.log('DA FUCK....', objectId)
               if (ObjectId.isValid(objectId)) {
                 or.$or.push({
                   [value]: objectId
@@ -241,9 +223,6 @@ module.exports = {
           } else {
             or.$or.push({[value]: options.query[value]})
           }
-
-       
-
 
           }
 
@@ -264,7 +243,6 @@ module.exports = {
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
-          console.log(options.query)
           eval(model)[options.type](options.query)
             .skip(Number(options.perPage * options.page))
             .limit(Number(options.perPage))

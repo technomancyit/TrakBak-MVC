@@ -89,6 +89,8 @@ router.route(pathSet).post(async (req, res) => {
                 type: req.body.type,
                 owner: sender
             },
+            populate:"owner",
+            excludes:"-messages",
             socketInfo
         }).catch(e => {
             console.log(e);
@@ -96,14 +98,14 @@ router.route(pathSet).post(async (req, res) => {
         });
 
         if (ticket) {
-
+            console.log('TICKET', ticket.owner)
             systemNotification('Tickets', ticket);
-            let notfication = new Notification(ticket, 'This is the notification', {
-                recipients: ['test', 'chad'],
+            let notfication = new Notification(ticket, req.body.message, {
                 model: models.Tickets,
-                sender,
+                sender: ticket.owner,
                 route: 'post'
             });
+
             notfication.exec(['socketNotification', 'emailNotification']);
             switch (req.body.template) {
                 case "general":

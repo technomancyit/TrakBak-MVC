@@ -1,4 +1,6 @@
 'use strict';
+const mongoose = require('mongoose'),
+mailer = require('../mail/mailer');
 
 //The system notification mailer... Not recommended to use vs database notification system. (Users can't turn this off or format it to their needs)  Also requires entry for each model. or else crashes can happen.
 
@@ -30,8 +32,6 @@ module.exports = async (modelName, doc) => {
         object.from = ticket ? ticket.owner.account : doc.owner.account;
         object.email = ticket ? ticket.owner.email : doc.owner.email;
         object.type = ticket ? ticket.type : doc.type;
-
-        console.log('THIS object', object)
 
         mailer({
             sendSeperate: true,

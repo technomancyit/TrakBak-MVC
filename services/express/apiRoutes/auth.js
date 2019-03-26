@@ -21,11 +21,8 @@ router.post('/login', function (req, res, next) {
                 return res.send(err);
             } else {
 
-
-                
             let token = await jwt.sign(JSON.stringify(user), config.express.jwt);
 
-            console.log('RANz', token);
           // user = user.user;
             return res.json({token, user});
             }

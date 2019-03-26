@@ -136,12 +136,9 @@ async function asyncRoute() {
                         var popSearch = key.split('.');
                         var value = query.query[key];
 
-
                         if (popSearch.length > 1) {
 
-
-
-                            modelName = file.slice(0, -3);
+                            let modelName = file.slice(0, -3);
 
                             let ref = Array.isArray(model[modelName].schema.paths[popSearch[0]].options.type) ?
                                 model[modelName].schema.paths[popSearch[0]].options.type[0].ref :
@@ -160,8 +157,6 @@ async function asyncRoute() {
                                     }
                                 },
                                 pOptions);
-
-
 
                             let lookup = await models[ref].m_read(
                                 combine
@@ -225,11 +220,9 @@ async function asyncRoute() {
                     if (Object.keys(data).length !== 0 && !data.err && types[i] == 'post' || types[i] == 'put' || types[i] == 'delete') {
                         let sendData = data.data ? data.data : data;
                         systemNotification(filename, sendData);
-
-
-                        let notfication = new Notification(sendData, 'This is the notification', {
+                        let notfication = new Notification(sendData, query.query.text, {
                             model: models[filename],
-                            sender: query.query.sender ? query.query.sender : undefined,
+                            sender: sendData.sender ? sendData.sender  : undefined,
                             route: types[i]
                         });
                         // notfication.socketNotification()
