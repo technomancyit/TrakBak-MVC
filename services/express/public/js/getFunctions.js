@@ -230,7 +230,7 @@ function getApi(url, type) {
         },
         error: function (err) {
             if (type === 'me') {
-                alert('error', {
+                navAlert('error', {
                     title: 'Cookie Error',
                     text: 'Please login again'
                 });

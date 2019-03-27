@@ -56,14 +56,28 @@ function postApi(url, data, type) {
             success: function (data) {
 
                 data = JSON.parse(data);
+
+
+                if(type === 'mailer') {
+                    
+                    if(data.err) return navAlert('error', { title: 'Email sending', text: data.err });
+
+                    $('#sendEmail').find("input, #contact_textarea").each((index, data) => console.log(data.value = ''));
+                    $('#sendEmailButton').html('Send Email');
+
+                    navAlert('info', { title: 'Email sending', text: "contact request was sent successfully. Please reply back to email if you have any questions." });
+
+
+                    return;
+                }
+
          //       console.log(type);
                 // if(typeof type === 'object' && type.body) socketSocketPush({room:'5c89ea1b1f550d408dbb8f8c', action:'send', body:type.body});
                     
                 
 
                 if (data.alert) {
-                    alert(data.alert.type, { title: data.alert.title, text: data.alert.text });
-                    console.log(type, 'a')
+                    navAlert(data.alert.type, { title: data.alert.title, text: data.alert.text });
                     if (type === 'rp') {
 
                         window.history.replaceState({}, document.title, "/" + "");
@@ -73,10 +87,8 @@ function postApi(url, data, type) {
                 }
 
                 if (type === 'login') {
-                    console.log('RANNZZ')
                     userApp.mgSync = data;
                     userHead.mgSync = data;
-                    console.log(data.token);
                     setCookie('jwt', data.token, 1);
                     $('#userModal').modal('hide');
                     window.history.replaceState({}, document.title, "/" + "");
@@ -84,9 +96,9 @@ function postApi(url, data, type) {
                         this.reset();
                     });
                     if (userApp.mgSync.registration) {
-                        alert('success', { title: 'Registration Successful', text: 'Please check email for registration.' });
+                        navAlert('success', { title: 'Registration Successful', text: 'Please check email for registration.' });
                     } else {
-                        alert('info', { title: 'Login Successful', text: 'Logged in successfully.' });
+                        navAlert('info', { title: 'Login Successful', text: 'Logged in successfully.' });
                         if (userApp.mgSync.user.verified && userApp.mgSync.user.verified !== '') {
                             userApp.alerts.push({
                                 type: 'alert-danger', title: 'Email registration ', text: 'You must register your email before playing.', close: 'alert-dismissible', vue: "resendEmail",
@@ -111,7 +123,7 @@ function postApi(url, data, type) {
                             $('#resetPW').modal('hide');
                             $('#userModal').modal('show')
 
-                            alert('info', { title: 'Password reset successful', text: obj.success });
+                            navAlert('info', { title: 'Password reset successful', text: obj.success });
                         }
 
 
@@ -123,12 +135,12 @@ function postApi(url, data, type) {
                 err = err.responseText ? JSON.parse(err.responseText) : JSON.parse(err);
                 if (err.alert) {
 
-                    alert(err.alert.type, { title: err.alert.title, text: err.alert.text });
-
+                    navAlert(err.alert.type, { title: err.alert.title, text: err.alert.text });
+                    $('#sendEmailButton').html('Send Email');
                 } else {
 
                     if (type === 'login') {
-                        alert('error', { title: 'Login Error', text: err.errorMsg });
+                        navAlert('error', { title: 'Login Error', text: err.errorMsg });
                     }
 
                     if (type === 'rp') {
@@ -136,7 +148,7 @@ function postApi(url, data, type) {
                         if (err) {
                             let obj = err.errorMsg;
                             window.history.replaceState({}, document.title, "/" + "");
-                            alert('error', { title: 'Reset password error', text: obj.err });
+                            navAlert('error', { title: 'Reset password error', text: obj.err });
                         }
                     }
                 }

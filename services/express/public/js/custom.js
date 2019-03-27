@@ -354,7 +354,7 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-function alert(type, msg, options) {
+function navAlert(type, msg, options) {
     if (options) {
         toastr.options = options;
     }

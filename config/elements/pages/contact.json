@@ -25,7 +25,7 @@
             {
                 "icon": "pencil-alt",
                 "field": "Message",
-                "name": "textarea",
+                "name": "message",
                 "type": "textarea",
                 "id": "contact_textarea"
             }

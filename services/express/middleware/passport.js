@@ -17,7 +17,7 @@ passport.use('local-signin', new LocalStrategy({
     async function (account, password, cb) {
         console.log('THIS ACCOUNT', account);
         let user
-        options = {
+        let options = {
             query: { account },
             type: 'findOne',
             login: true,

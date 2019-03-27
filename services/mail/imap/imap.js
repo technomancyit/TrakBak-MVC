@@ -1,9 +1,10 @@
 'use strict';
 
 const Imap = require('imap'),
-systemNotification = require('../../notifications/systemNotifications'),
-mongoose = require('mongoose'),
-models = mongoose.models;
+  systemNotification = require('../../notifications/systemNotifications'),
+  mongoose = require('mongoose'),
+  MailParser = require("mailparser-mit").MailParser,
+  models = mongoose.models;
 
 
 async function extractJSON(str) {
@@ -44,7 +45,7 @@ module.exports = (auth, options) => {
 
   imap.once("ready", execute);
   imap.once("error", function (err) {
-   console.error("Connection error: " + err.stack);
+    console.error("Connection error: " + err.stack);
   });
 
   imap.connect();
@@ -88,19 +89,21 @@ module.exports = (auth, options) => {
             });
             stream.once('end', async function () {
 
-
               if (info.which !== 'TEXT')
 
                 header = Imap.parseHeader(buffer);
 
               else {
                 var text = buffer;
-                let reg = new RegExp(`Content-Transfer-Encoding(.|\n|\r)+${auth.user}`, 'i');
-                let findText = text.match(reg);
-                
-                let object = await extractJSON(text);
+                let reg = new RegExp(`Content-Transfer-Encoding([\\s\\S]*?)${auth.user}`, 'i');
 
-                object = object[0];
+                let findText = text.match(reg);
+                let jsonText = await text.replace(/=|\r?\n|\r|/g, '')
+
+
+                let object = await extractJSON(jsonText);
+
+                object = object && object.length > 0 ? object[0] : undefined;
 
                 if (findText) {
                   let text = findText[0].split('\n');
@@ -108,7 +111,7 @@ module.exports = (auth, options) => {
                   text[findText.length - 1] = undefined;
                   text[0] = undefined;
                   actualText = text.join('\n');
-
+                  actualText = actualText.replace(/=[a-zA-Z]?[0-9]*=[a-zA-Z]?[0-9]*=[a-zA-Z]?[0-9]*/g, '').replace(/Content-Disposition:(.*)/g, '').replace(/=3D/g, '=');;
                   objects.push(object);
 
                 }
@@ -131,8 +134,8 @@ module.exports = (auth, options) => {
               type: "findOne"
             }).catch(e => console.log(e));
 
-            if (user) {
-
+            if (user && objects && objects.length > 0) {
+              console.log('THIS USER', objects)
               var message = {
                 "type": "ticket",
                 "ticket": objects[0].id,
@@ -150,19 +153,29 @@ module.exports = (auth, options) => {
                 body: message,
                 socketInfo,
                 populate: 'sender'
-              }).catch(e => console.log(e));
+              }).catch(e => {
 
-              systemNotification('Messages', messageDoc.data);
+                console.log(e)
 
-              let notification = new Notification(messageDoc.data, message.text, {
-                model: models.Messages,
-                sender: user,
-                route: 'post'
-            });
-            // notfication.socketNotification()
-            // notfication.emailNotification()
-            notification.exec(['socketNotification', 'emailNotification']);
+              });
 
+              if (messageDoc) {
+                systemNotification('Messages', messageDoc.data);
+
+                let notification = new Notification(messageDoc.data, message.text, {
+                  model: models.Messages,
+                  sender: user,
+                  route: 'post'
+                });
+                // notfication.socketNotification()
+                // notfication.emailNotification()
+                notification.exec(['socketNotification', 'emailNotification']);
+
+              }
+
+            } else {
+
+              //log here what went wrong
             }
 
             imap.seq.move(seqno, 'processed', (err, data) => {

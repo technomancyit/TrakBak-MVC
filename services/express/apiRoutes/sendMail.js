@@ -1,24 +1,29 @@
 'use strict';
-
-"use strict";
 const express = require('express'),
     mongoose = require('mongoose'),
     models = mongoose.models,
     systemNotification = require('../../notifications/systemNotifications'),
     server = require('../server').app,
+    emailExistence = require('email-existence'),
     randomstring = require("randomstring"),
     mailer = require('../../../services/mail/mailer'),
-    Verifier = require("email-verifier"), {
+    swearjar = require('swearjar'),
+    Verifier = require("email-verifier"),
+    {
         Tickets
     } = require("../../../apiModels/Tickets"),
-    cookie = require('cookie'), {
+    cookie = require('cookie'),
+    {
         promisify
     } = require("util"),
-    jwt = require('jsonwebtoken'), {
+    jwt = require('jsonwebtoken'),
+    {
         Users
     } = require('../../../apiModels/Users'),
     router = express.Router()
 const Notification = require('../../notifications/userNotification');
+
+
 
 let verifier = new Verifier("at_VLZKJ87dDSp9lQEGjMGPzW71bh4f8");
 
@@ -29,21 +34,28 @@ if (config.express.port) {
     hostname = config.express.hostname;
 }
 
+
 verifier.verify = promisify(verifier.verify);
+emailExistence.check = promisify(emailExistence.check);
 
 var pathSet = '/';
 router.route(pathSet).post(async (req, res) => {
-
+    let verifiedEmail = {};
+    let emailExists;
     let error = {};
-    let verifiedEmail = await verifier.verify(req.body.email, {
-        hardRefresh: true
-    }).catch(e => e);
-
+    let profanity = (swearjar.profane(req.body.email) || swearjar.profane(req.body.message) || swearjar.profane(req.body.name));
+    if (!profanity) emailExists = await emailExistence.check(req.body.email).catch(e => console.log(e));
+    console.log(emailExists)
+    if(emailExists)
+    verifiedEmail = await verifier.verify(req.body.email).catch(e => e);
     verifiedEmail.smtpCheck = (verifiedEmail.smtpCheck === 'true');
     verifiedEmail.formatCheck = (verifiedEmail.formatCheck === 'true');
     verifiedEmail.dnsCheck = (verifiedEmail.dnsCheck === 'true');
+    verifiedEmail.freeCheck = (verifiedEmail.freeCheck === 'true');
+    verifiedEmail.disposableCheck = (verifiedEmail.disposableCheck === 'true');
+    verifiedEmail.catchAllCheck = (verifiedEmail.catchAllCheck === 'true');
 
-    if (verifiedEmail.formatCheck && verifiedEmail.smtpCheck && verifiedEmail.dnsCheck || verifiedEmail.formatCheck && verifiedEmail.freeCheck && verifiedEmail.dnsCheck) {
+    if (verifiedEmail.formatCheck && verifiedEmail.smtpCheck && verifiedEmail.dnsCheck && !verifiedEmail.disposableCheck && !verifiedEmail.catchAllCheck || verifiedEmail.formatCheck && verifiedEmail.freeCheck && verifiedEmail.dnsCheck && !verifiedEmail.disposableCheck && !verifiedEmail.catchAllCheck) {
 
         let randomPassword = randomstring.generate(32);
         let user = await models.Users.m_create({
@@ -89,8 +101,8 @@ router.route(pathSet).post(async (req, res) => {
                 type: req.body.type,
                 owner: sender
             },
-            populate:"owner",
-            excludes:"-messages",
+            populate: "owner",
+            excludes: "-messages",
             socketInfo
         }).catch(e => {
             console.log(e);
@@ -98,7 +110,7 @@ router.route(pathSet).post(async (req, res) => {
         });
 
         if (ticket) {
-            console.log('TICKET', ticket.owner)
+
             systemNotification('Tickets', ticket);
             let notfication = new Notification(ticket, req.body.message, {
                 model: models.Tickets,
@@ -132,13 +144,21 @@ router.route(pathSet).post(async (req, res) => {
         }
 
     } else {
-        console.log('dooka', verifiedEmail);
-        error.err = "Could not verify your email address.";
+
+        error.err = profanity ? "Could not send email. Please check profanity inside message, and email address." : "Could not verify your email address to send email."
+
+        error.profanity = profanity;
     }
 
     if (error.err) {
 
-        return res.status(404).send(JSON.stringify(error));
+        return res.status(401).send({
+            alert: {
+                title: 'Sending email',
+                type: "error",
+                text: error.err
+            }
+        });
 
     }
 

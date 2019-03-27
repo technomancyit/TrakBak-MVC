@@ -9,6 +9,7 @@
     </p>
   </div>
   <div class="card card-body py-5">
+    
     <h3>
       <%- contact.contactTitle %>
     </h3>
@@ -27,19 +28,18 @@
           </div>
           <%if (contact.contactForm.fields[i].type !== "textarea") { %>
           <input id="<%- contact.contactForm.fields[i].id %>" name="<%- contact.contactForm.fields[i].name %>" type="<%- contact.contactForm.fields[i].type %>"
-            class="form-control bg-dark text-white" placeholder="<%- contact.contactForm.fields[i].field %>">
+            class="form-control bg-dark text-white" placeholder="<%- contact.contactForm.fields[i].field %>" required>
           <% } %>
           <%if (contact.contactForm.fields[i].type === "textarea") { %>
           <textarea id="<%- contact.contactForm.fields[i].id %>" name="<%- contact.contactForm.fields[i].name %>" class="form-control bg-dark text-white"
-            placeholder="<%- contact.contactForm.fields[i].field %>"></textarea>
+            placeholder="<%- contact.contactForm.fields[i].field %>" required></textarea>
           <% } %>
         </div>
       </div>
       <% } %>
         <%if (contact.contactForm.recaptcha) { %>
         <div class="text-right">
-          <input  :style="forms.sendEmail.recaptcha.on" data-expired-callback="recaptchaCallbackDisconnect" type="submit" @click="sendEmail" value="<%- contact.contactForm.submitButtonText %>"
-            class="btn btn-primary btn-block btn-lg">
+          <button class="btn btn-primary btn-block btn-lg"type="button" id="sendEmailButton" :style="forms.sendEmail.recaptcha.on" data-expired-callback="recaptchaCallbackDisconnect" type="submit" @click="sendEmail"><%- contact.contactForm.submitButtonText %></button>
 
           <div :style="forms.sendEmail.recaptcha.off" data-callback="recaptchaCallback" data-expired-callback="recaptchaCallbackDisconnect"
             class="g-recaptcha" data-sitekey="<%- contact.contactForm.recaptchSiteKey %>"></div><br>
@@ -47,8 +47,9 @@
         
         <% } %>
         <%if (!contact.contactForm.recaptcha) { %>
-        <div class="text-right">
-          <input type="submit" @click="sendEmail" value="<%- contact.contactForm.submitButtonText %>" class="btn btn-primary btn-block btn-lg">
+        <div type="button" class="text-right">
+          <button class="btn btn-primary btn-block btn-lg"type="button" id="sendEmailButton" :style="forms.sendEmail.recaptcha.on" data-expired-callback="recaptchaCallbackDisconnect" type="submit" @click="sendEmail"><%- contact.contactForm.submitButtonText %></button>
+
         </div>
         <% } %>
  
