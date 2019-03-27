@@ -1,14 +1,20 @@
 object = {
     navClick: (event) => {
 
-        if(adminApp.lastPage) socketLeaveRoom({room:adminApp.lastPage, action:'leave'});
+        if (adminApp.lastPage) socketLeaveRoom({
+            room: adminApp.lastPage,
+            action: 'leave'
+        });
 
         var id = event.target.id !== '' ? event.target.id : $(event.target).parent()[0].id;
         var lastNav = document.getElementById(adminApp.navigation);
         lastNav.classList.remove("active");
         adminApp.lastPage = id;
         adminApp.navigation = id;
-        if(adminApp.lastPage) socketJoinRoom({room:id, action:'join'});
+        if (adminApp.lastPage) socketJoinRoom({
+            room: id,
+            action: 'join'
+        });
         var currentNav = document.getElementById(id);
         currentNav.classList.add("active");
         adminApp.editor = '';
@@ -21,9 +27,10 @@ object = {
 
             if ($("#ticketTable")[0]) {
 
+
                 adminApp.clickMenu = [{
                         id: "id",
-                        key:"ticket",
+                        key: "ticket",
                         name: "Open Ticket",
                         modal: "showTicket"
                     },
@@ -50,7 +57,7 @@ object = {
                     autoWidth: false,
                     ajax: `/api/tickets?count=t&or=t&populate=owner messages categories`,
 
-                    
+
                     columns: [
 
                         {
@@ -63,15 +70,15 @@ object = {
                             "width": "5%",
                             "name": "categories.name",
                             render: function (data, type, row) {
-                                if(row && row.categories && Array.isArray(row.categories) && row.categories.length > 0) {
+                                if (row && row.categories && Array.isArray(row.categories) && row.categories.length > 0) {
                                     console.log('RAN F', row.categories)
                                     return row.categories = row.categories[0].name;
-                                } else if(row && row.categories) {
+                                } else if (row && row.categories) {
                                     console.log('RAN');
                                     return row.categories = 'None';
                                 } else {
                                     console.log('RANLAT')
-                                  return;
+                                    return;
                                 }
                             }
                         },
@@ -103,15 +110,72 @@ object = {
                     },
                 });
 
-
                 $('#mainSearch').keyup(function () {
                     adminApp.ticketTable.search($(this).val()).draw();
                 })
 
-
-                if($('#mainSearch').val()) $('#mainSearch').keyup();
+                if ($('#mainSearch').val()) $('#mainSearch').keyup();
 
                 adminApp.ticketTable.columns.adjust();
+
+                var pressTimer;
+                var upMouse;
+
+
+
+                if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+                    $("#ticketTable").mouseout(function (event) {
+
+                        if(!upMouse) {
+                            adminApp.openedMenu = false;
+                            $("#context-menu").removeClass("show").hide();
+                            
+                            clearTimeout(pressTimer);
+                        } else {
+              
+           
+    
+        
+    
+                            upMouse = false;
+                            clearTimeout(pressTimer);
+    
+                        }
+    
+    
+    
+    
+                        // Clear timeout
+                        return false;
+                    }).mouseover(function (event) {
+    
+                        // Set timeout
+          
+                        if(!upMouse)
+                        pressTimer = window.setTimeout(function () {
+                            console.log('RAN')
+                            upMouse = true;
+    
+    
+                            adminApp.openedMenu = true;
+                            var top = event.originalEvent.pageY - 10;
+                            var left = event.originalEvent.pageX - 90;
+    
+                            $("#context-menu").css({
+                                display: "block",
+                                top: top,
+                                left: left
+                            }).addClass("show").on("click", function () {
+                                $("#context-menu").removeClass("show").hide();
+                            });
+    
+    
+                        }, 1000);
+                        return false;
+                    });
+    
+                }
+
 
             } else {
 
@@ -122,10 +186,10 @@ object = {
             }
 
         }
-        
-        if(adminApp.navigation === 'tickets')  _cb()
 
-        
+        if (adminApp.navigation === 'tickets') _cb()
+
+
 
     },
     capitalizeFirstLetter: (string) => {
@@ -171,14 +235,19 @@ object = {
         }
     },
     clickMenuFunction: (id, key, type, modal) => {
-        
-        if(type === 'message') {
-        getApi(`/api/messages?${key}=${id}&populate=sender%20messages&perPage=0`, 'menuLoad');
-        socketJoinRoom({room:id, action:'join'});
+
+        if (type === 'message') {
+            getApi(`/api/messages?${key}=${id}&populate=sender%20messages&perPage=0`, 'menuLoad');
+            socketJoinRoom({
+                room: id,
+                action: 'join'
+            });
         }
-        
-        
-        adminApp.tempRooms[modal] = {id};
+
+
+        adminApp.tempRooms[modal] = {
+            id
+        };
         adminApp.modal = true;
         adminApp.clickMenuObj.id = id;
         adminApp.$forceUpdate();
@@ -192,23 +261,23 @@ object = {
 
         console.log('id', id);
 
-        if(!adminApp.menuObj.activeMembers) adminApp.menuObj.activeMembers = {};
+        if (!adminApp.menuObj.activeMembers) adminApp.menuObj.activeMembers = {};
 
-        if(adminApp.menuObj.activeMembers[id]) return false;
+        if (adminApp.menuObj.activeMembers[id]) return false;
         adminApp.menuObj.activeMembers[id] = true;
         console.log('id', id);
         return true;
 
     },
 
-    
-    LetterAvatar : (name, size) => {
 
-        name  = name || '';
-        size  = size || 60;
+    LetterAvatar: (name, size) => {
+
+        name = name || '';
+        size = size || 60;
 
         var colours = [
-                "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50", 
+                "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50",
                 "#f1c40f", "#e67e22", "#e74c3c", "#ecf0f1", "#95a5a6", "#f39c12", "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d"
             ],
 
@@ -217,7 +286,7 @@ object = {
 
 
         if (nameSplit.length == 1) {
-            initials = nameSplit[0] ? nameSplit[0].charAt(0):'?';
+            initials = nameSplit[0] ? nameSplit[0].charAt(0) : '?';
         } else {
             initials = nameSplit[0].charAt(0) + nameSplit[1].charAt(0);
         }
@@ -225,41 +294,41 @@ object = {
         if (w.devicePixelRatio) {
             size = (size * w.devicePixelRatio);
         }
-            
-        charIndex     = (initials == '?' ? 72 : initials.charCodeAt(0)) - 64;
-        colourIndex   = charIndex % 20;
-        canvas        = d.createElement('canvas');
-        canvas.width  = size;
+
+        charIndex = (initials == '?' ? 72 : initials.charCodeAt(0)) - 64;
+        colourIndex = charIndex % 20;
+        canvas = d.createElement('canvas');
+        canvas.width = size;
         canvas.height = size;
-        context       = canvas.getContext("2d");
-         
+        context = canvas.getContext("2d");
+
         context.fillStyle = colours[colourIndex - 1];
-        context.fillRect (0, 0, canvas.width, canvas.height);
-        context.font = Math.round(canvas.width/2)+"px Arial";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.font = Math.round(canvas.width / 2) + "px Arial";
         context.textAlign = "center";
         context.fillStyle = "#FFF";
         context.fillText(initials, size / 2, size / 1.5);
 
         dataURI = canvas.toDataURL();
-        canvas  = null;
+        canvas = null;
 
         return dataURI;
     },
     sendMsg: (event) => {
         event.preventDefault();
 
-        if($('#ticketTextarea').val() === '') return;
+        if ($('#ticketTextarea').val() === '') return;
 
         let body = {
             sender: adminApp.mgSync.user._id
         }
 
 
-        if(adminApp.navigation === 'tickets' ) {
+        if (adminApp.navigation === 'tickets') {
 
-         
-                body.ticket = adminApp.clickMenuObj.id;
-            
+
+            body.ticket = adminApp.clickMenuObj.id;
+
 
             body.type = "ticket";
             body.text = $('#ticketTextarea').val();
@@ -271,15 +340,37 @@ object = {
             object: 'ticket'
         }
 
-        postApi('/api/messages?populate=sender&perPage=0&excludes=-messages -groups -permissions', body, {'account':adminApp.mgSync.user, body:body});
-        
-       
+        postApi('/api/messages?populate=sender&perPage=0&excludes=-messages -groups -permissions', body, {
+            'account': adminApp.mgSync.user,
+            body: body
+        });
+
+
 
     },
     checkAuth() {
         console.log('ran');
     },
+    hideSide() {
+
+        if (adminApp.side === 0) {
+
+            $(".sidebar-fixed").css('display', 'none');
+            $(".navbar, .page-footer, main").css('padding-left', '0px');
+
+            adminApp.side = 1;
+
+        } else {
+
+            $(".sidebar-fixed").css('display', 'initial');
+            $(".navbar, .page-footer, main").css('padding-left', '235px');
+
+            adminApp.side = 0;
+
+        }
+
+    },
     ObjectId: (m = Math, d = Date, h = 16, s = s => m.floor(s).toString(h)) =>
-    s(d.now() / 1000) + ' '.repeat(h).replace(/./g, () => s(m.random() * h))
+        s(d.now() / 1000) + ' '.repeat(h).replace(/./g, () => s(m.random() * h))
 
 }

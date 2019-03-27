@@ -5,6 +5,7 @@ object = {
     menuObj: {},
     tempRooms: {},
     modal: false,
+    side: 0,
     navigation: "dashboard",
     tickets: [],
     mgSync: {},

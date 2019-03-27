@@ -24,20 +24,20 @@
   max-height: 50px;
 }
 
-@media (min-width: 1200px) {
+
 
   .navbar,
   .page-footer,
   main {
-    padding-left: 270px;
+    padding-left: 235px;
   }
-}
 
-@media (max-width: 1199.98px) {
+
+/* @media (max-width: 1199.98px) {
   .sidebar-fixed {
     display: none;
   }
-}
+} */
 
 
 .card.card-cascade.narrower .view.view-cascade {
@@ -66,7 +66,7 @@
 
 body {
   /* Margin bottom by footer height */
-  margin-bottom: 220px;
+  margin-bottom: 50px;
 }
 
 
@@ -198,5 +198,12 @@ pre {
 }
 
 .round { border-radius: 50%; }
+
+
+
+
+
+
+
 
 
