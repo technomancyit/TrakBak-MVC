@@ -1,7 +1,7 @@
 <!-- WORK  -->
 
 <div id="work" class="collapse container container-fill">
-  <div class="card card-body bg-warning text-white py-5 card-square">
+  <div class="card card-body bg-<%- colors[2] %> text-white py-5 card-square">
     <h2>
       <%- work.title %>
     </h2>
@@ -18,7 +18,7 @@
     </p>
     <div class="row no-gutters justify-content-md-center">
       <% for(var i=0; i < work.works.length; i++) { %>
-      <div class="card col-md-3 mx-3 my-3 bg-primary mb-3">
+      <div class="card col-md-3 mx-3 my-3 bg-<%- colors[2] %> mb-3">
 
         <!-- Card image -->
         <div class="view overlay">

@@ -1,5 +1,9 @@
 object = {
     navClick: (event) => {
+        let classNames = event.target.className;
+
+          var findClass = classNames.match(/nav-select-([^\s]+)/);
+          adminApp.navColor = findClass[1];
 
         if (adminApp.lastPage) socketLeaveRoom({
             room: adminApp.lastPage,
@@ -121,8 +125,6 @@ object = {
                 var pressTimer;
                 var upMouse;
 
-
-
                 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
                     $("#ticketTable").mouseout(function (event) {
 
@@ -132,19 +134,12 @@ object = {
                             
                             clearTimeout(pressTimer);
                         } else {
-              
-           
-    
-        
-    
+
                             upMouse = false;
                             clearTimeout(pressTimer);
     
                         }
-    
-    
-    
-    
+
                         // Clear timeout
                         return false;
                     }).mouseover(function (event) {
@@ -153,9 +148,13 @@ object = {
           
                         if(!upMouse)
                         pressTimer = window.setTimeout(function () {
-                            console.log('RAN')
+                         
                             upMouse = true;
-    
+                            let id = $(event.target).parent()[0].id;
+
+                            adminApp.clickMenu.forEach((menu, index) => {
+                                adminApp.clickMenu[index].id = id;
+                            });
     
                             adminApp.openedMenu = true;
                             var top = event.originalEvent.pageY - 10;

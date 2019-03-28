@@ -30,13 +30,32 @@ if (config.express.signUp) {
 
 
 
+function shuffle(arra1) {
+    var ctr = arra1.length, temp, index;
+
+// While there are elements in the array
+    while (ctr > 0) {
+// Pick a random index
+        index = Math.floor(Math.random() * ctr);
+// Decrease ctr by 1
+        ctr--;
+// And swap the last element with it
+        temp = arra1[ctr];
+        arra1[ctr] = arra1[index];
+        arra1[index] = temp;
+    }
+    return arra1;
+}
+
+
 var pathSet = config.express.signUp ? '/' : '/';
 
 var elements = Object.assign({
     home: require('../../../config/elements/pages/home.json'),
     resume: require('../../../config/elements/pages/resume.json'),
     work: require('../../../config/elements/pages/work.json'),
-    contact: require('../../../config/elements/pages/contact.json')
+    contact: require('../../../config/elements/pages/contact.json'),
+    colors: shuffle(['primary', 'success', 'warning', 'danger'])
 });
 
 if(config.express.recaptchaSiteSecret && config.express.recaptchSiteKey && elements.contact.contactForm.recaptcha) {

@@ -10,6 +10,7 @@ object = {
     tickets: [],
     mgSync: {},
     alerts: [],
+    navColor: 'primary',
     forgotPassword: false,
     forms: {
         sendEmail: {

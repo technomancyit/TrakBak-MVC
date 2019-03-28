@@ -1,6 +1,6 @@
     <!-- HOME -->
     <div id="home" class="collapse show">
-        <div class="card card-body bg-primary text-white py-5 card-square">
+        <div class="card card-body bg-<%- colors[0] %> text-white py-5 card-square">
           <h2><%- home.title %></h2>
           <p class="lead"><%- home.titleParagraph %></p>
         </div>
@@ -12,7 +12,7 @@
           <% for(var i=0; i < home.skills.length; i++) { %>
           <h4><%- home.skills[i].name %></h4>
           <div class="progress mb-3">
-            <div class="progress-bar bg-success" style="width:<%- home.skills[i].percentage %>"></div>
+            <div class="progress-bar bg-<%- colors[0] %>" style="width:<%- home.skills[i].percentage %>"></div>
           </div>
           <% } %>
 
