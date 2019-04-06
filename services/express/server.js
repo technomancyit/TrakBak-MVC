@@ -7,7 +7,9 @@ const express = require('express'),
     } = require('util'),
     fs = require('fs'),
     path = require('path'),
+    reqReload = require('require-reload')(require),
     routes = require('./routes/routes'),
+    reload = require('reload'),
     app = express(),
     http = require('http').Server(app),
     Sockets = require('../sockets/socket.io'),
@@ -163,4 +165,9 @@ http.listen(config.express.port, () => {
 module.exports = {app, sockets};
 
 
-setTimeout(function(){ console.log(sockets.socketClients) }, 3000);
+setTimeout(function(){ 
+    console.log(sockets.socketClients);
+    let index  = reqReload('./routes/index');
+    app[index.type](index.path+'1/', index.route);
+     
+}, 3000);

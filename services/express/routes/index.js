@@ -65,13 +65,16 @@ if(config.express.recaptchaSiteSecret && config.express.recaptchSiteKey && eleme
     elements.contact.contactForm.recaptcha = false;
 }
 
+console.log('RANz', elements.colors, 'hr')
+
 
 
 module.exports = {
     route: (req, res) => {
         res.render(page, elements);
     },
-    path: pathSet
+    path: pathSet,
+    type: 'get'
 }
 
 // require('./mongooseAutomationRoutes');

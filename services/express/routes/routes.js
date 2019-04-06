@@ -1,7 +1,8 @@
 'use strict';
 
 const express = require('express'),
-    routes = require('./routeSetup'),
+reload = require('require-reload')(require),
+    routes = reload('./routeSetup'),
     passport = require('passport'),
     permissions = require('../middleware/permissions'),
     groups = require('../middleware/groups'),
@@ -27,5 +28,6 @@ routes.then(async (rf) => {
     });
 
 });
+
 
 module.exports = router;
