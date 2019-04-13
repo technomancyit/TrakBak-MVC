@@ -61,10 +61,10 @@ const options = {
     prefix: 'api',
     routes: {
         m_create: {
-
+            api: false
         },
         m_read: {
-
+           
         },
         m_update: {
             permissions: 1

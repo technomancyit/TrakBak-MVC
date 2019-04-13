@@ -7,6 +7,7 @@ var userApp = new Vue({
     mgSync: {},
     alerts: [],
     forgotPassword: false,
+    openedWork: 'blayde',
     recaptchSiteKey: "6LfBBZYUAAAAAEfdHor9VmKw7zBAPs9ou45lfoCq",
 
     forms: {
@@ -54,6 +55,11 @@ var userApp = new Vue({
             $('#sendEmail')[0].reportValidity()
         }
 
+    },
+    openWork(e) {
+        let id = e.target.id;
+        userApp.openedWork = id;
+        $('#workModal').modal('show');
     }
  },
     

@@ -24,7 +24,7 @@
         <div class="view overlay">
           <img class="card-img-top" src="<%- work.works[i].img %>" alt="Card image cap">
           <a>
-            <div class="mask rgba-blue-slight"></div>
+            <div @click="openWork" id="<%- work.works[i].id %>" class="mask rgba-blue-slight"></div>
           </a>
         </div>
 

@@ -31,5 +31,10 @@ object = {
             $('#sendEmail')[0].reportValidity()
         }
 
+    },
+    openWork(e) {
+        let id = e.target.id;
+        userApp.openedWork = id;
+        $('#workModal').modal('show');
     }
 }

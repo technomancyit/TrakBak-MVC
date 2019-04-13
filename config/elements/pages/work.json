@@ -5,10 +5,11 @@
     "workParagraph": "Excepteur officia in dolor ut aliqua amet laborum ut nisi velit nostrud qui laborum.",
     "works": [
         {
-            "name": "Html",
-            "subName": "more awesome text",
+            "name": "BlaydeWorx",
+            "subName": "Construction Ticket System",
             "paragraph": "Magna sunt voluptate dolore proident labore aliqua eiusmod labore aliquip elit. Incididunt sit anim proident minim non aute laboris. Ea eiusmod culpa consectetur veniam ex voluptate enim do ut irure aliquip ut eiusmod. In excepteur pariatur proident non tempor id et non excepteur anim do. Eu sunt in anim id deserunt dolore fugiat.",
-            "img": "https://unsplash.it/1200/768.jpg?image=212"
+            "img": "/img/timeclock.png",
+            "id" : "blayde"
         },
         {
             "name": "Html",

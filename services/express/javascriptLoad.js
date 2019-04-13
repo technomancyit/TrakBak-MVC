@@ -17,7 +17,6 @@ async function awaitArray() {
     await Functions.asyncForEach(javascriptFiles, async (file) => {
         admin = false;
         both = false;
-
         async function setAdmin(bothSet) {
             if(bothSet) both = true;
             admin = true;
@@ -26,6 +25,7 @@ async function awaitArray() {
         }
 
         let adminCheck = {
+            
             'adminApp.js': {both:false},
             '9-getFunctions.js': {both:true},
             '8-postFunctions.js': {both:true},
@@ -39,6 +39,7 @@ async function awaitArray() {
             '6-dataTables-responsive.js' : {both:true},
             'moment.js' : {both:true},
             'mgSync.js' : {both:true},
+            'sockets.js' : {both:true},
             'letterAvatars.js' : {both:true},
             '9-toastr.min.js' : {both:true}
         }
@@ -78,7 +79,7 @@ async function awaitArray() {
     });
 
 
-       
+     
         
         fs.writeFile(`${dir}/views/partials/admin/scripts.ejs`, `${adminTopContent}<!-- Don't Edit below this line -->\n${adminContent}`);
 

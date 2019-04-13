@@ -3,6 +3,7 @@ object = {
     mgSync: {},
     alerts: [],
     forgotPassword: false,
+    openedWork: 'blayde',
     recaptchSiteKey: recaptchSiteKey,
 
     forms: {
