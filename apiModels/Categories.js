@@ -59,6 +59,7 @@ Model = Object.assign(Model, crudObj);
 
 const options = {
     prefix: 'api',
+    socket: false,
     routes: {
         m_create: {
             api: false

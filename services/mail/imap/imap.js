@@ -3,9 +3,7 @@
 const Imap = require('imap'),
   systemNotification = require('../../notifications/systemNotifications'),
   mongoose = require('mongoose'),
-  MailParser = require("mailparser-mit").MailParser,
   models = mongoose.models;
-
 
 async function extractJSON(str) {
   var firstOpen, firstClose, candidate;

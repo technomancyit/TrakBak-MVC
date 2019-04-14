@@ -268,7 +268,7 @@ async function asyncRoute() {
                 if(index === modelFiles.length - 1 && i === 3) {
                     options.last = true;
                 }
-                await socketRoutes(crud[i], filename, options);
+                await socketRoutes(types[i], filename, options);
 
             }
 

@@ -4,8 +4,6 @@ module.exports = (permissions) => {
     
     return async function (req, res, next) {
 
-        
-
         if(permissions === 0) return next();
 
         if(!req) return null;

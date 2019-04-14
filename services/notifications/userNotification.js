@@ -90,7 +90,7 @@ class Notification {
         }));
 
     }
-
+    
     schedule() {
 
     }
@@ -102,10 +102,9 @@ class Notification {
                 typeArr[1] = 'email';
         }
 
-
         if (this.notifications) return this.notifications
 
-        //layerone is global notifications. after this information will be used to look for user notiifcaitons that will overide these.
+        //layer one is global notifications. after this information will be used to look for user notiifcaitons that will overide these.
         let layerOne = await Notifications.m_read({
             query: {
                 type: 0,
@@ -168,8 +167,7 @@ class Notification {
         }
 
         //This is how it finds secondary notification objects (Certain objects dont have user information attached to them, so the system needs to find the parent to find the owner and anyone else that may have accesss)
-        var _id = this.doc.type ? this.doc[this.doc.type] : this.doc._id;
-        
+        var _id = this.doc.type ? this.doc[this.doc.type] : this.doc._id;      
         let pathName = this.doc.type;
         let modelName, object;
         if (pathName && this.model.schema.paths[pathName]) {
@@ -190,11 +188,6 @@ class Notification {
             users.variables.id = object._id;
             users.variables.msgId = this.doc._id;
 
-            
-
-            //  if(!users[object.owner]) users[object.owner] = {owner:true}
-
-            //  users[object.owner] = object.owner !== this.sender ? users[object.owner].status = true :  users[object.owner].status = false;
             //This is the layerTwo which is the secondary global notification check. Should now be able to do same request as above, but now knowing what the parent object is.
             let layerTwo = await Notifications.m_read({
                 query: {
@@ -303,9 +296,7 @@ class Notification {
             delete notifications.variables;
 
             Object.keys(notifications).forEach(async (key) => {
-                let value = notifications[key];
-
-               
+                let value = notifications[key];      
 
                 if (value.sockets && functions.includes('socketNotification')) this.socketNotification(value, seperate);
                 if (value.email && functions.includes('emailNotification')) this.emailNotification(value, seperate);
@@ -313,7 +304,6 @@ class Notification {
             });
 
         }
-
 
         Promise.all(this.promises).then(async (values) => {
             // console.log(this.notifications);

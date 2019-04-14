@@ -18,6 +18,13 @@ module.exports = class Sockets {
         //   this.text = obj.text;
         //   this.html = obj.html;
         //   this.attachments = obj.attachments;
+
+        this.init();
+
+    }
+
+    init() {
+        this.io.setMaxListeners(500);
     }
 
     async eraseRoutes() {
@@ -42,7 +49,9 @@ module.exports = class Sockets {
             rooms: {}
         }
         this.socket = socket;
-        console.log('a user connected');
+        console.log('asz user connected');
+        console.log('WTF', socket.id);
+        socket.emit('connected', true);
     }
 
     async disconnect(socket) {
@@ -89,13 +98,13 @@ module.exports = class Sockets {
     async broadcast(socket, options, data) {
 
         // socket.broadcast.in(page).emit(script, data);
-       
-        if(typeof socket === 'string') socket = this.io.sockets.connected[socket];
 
-        
+        if (typeof socket === 'string') socket = this.io.sockets.connected[socket];
+
+
         let type = options.type ? options.type : 'in';
 
-        if(type === 'in') {
+        if (type === 'in') {
 
             this.io[type](options.room).emit(options.script, data);
         } else {
@@ -110,10 +119,13 @@ module.exports = class Sockets {
     }
 
     async socketOn(name, options) {
-        this.io.on('connection', (socket) => {
-            
+        this.io.prependListener('connection', (socket) => {
+
+            console.log(this.io.listenerCount('connection').toString());
+
             let socketClients = this.socketClients;
             socket.on(name, (data) => {
+                console.log('FUCK YOU')
                 if (data.room && data.action === 'join') {
                     this.joinRoom(socket, data);
                     return;
@@ -125,13 +137,14 @@ module.exports = class Sockets {
                 }
 
                 if (data.room && data.action === 'send') {
-                    this.broadcast(socket, {room:data.room, script:'socketPush', type:'to'}, data.body);
+                    this.broadcast(socket, { room: data.room, script: 'socketPush', type: 'to' }, data.body);
                     return;
                 }
 
                 socket.emit(name, data);
 
             });
+
         });
 
         if (!options || !options.noClient) await this.clientLoad(name, options);
@@ -139,12 +152,13 @@ module.exports = class Sockets {
 
 
     async clientLoad(name, options) {
+
         options = options ? options : {};
-        let subname = options.subname ? options.subname : '';
-
-
+        let subname = options.subname ? options.subname : options.prefix ? options.prefix : '';
 
         if (!this.socketRoutesStream) {
+
+            console.log('WTFz', socketRoutesJs)
 
             this.socketRoutesStream = await fs.createWriteStream(socketRoutesJs, {
                 'flags': 'a'
@@ -152,7 +166,7 @@ module.exports = class Sockets {
         }
 
         this.socketRoutesStream.write(`socket.on('${name}', function (obj, options) {
-                
+
                 socketInterpreter(obj, options);
             });
     
