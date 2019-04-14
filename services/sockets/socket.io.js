@@ -125,7 +125,7 @@ module.exports = class Sockets {
 
             let socketClients = this.socketClients;
             socket.on(name, (data) => {
-                console.log('FUCK YOU')
+
                 if (data.room && data.action === 'join') {
                     this.joinRoom(socket, data);
                     return;
