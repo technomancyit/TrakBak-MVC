@@ -6,7 +6,7 @@ object = {
         if ($('#sendEmail')[0].checkValidity()) {
 
             var formdata = $('#sendEmail').serializeArray();
-            formdata.length--;
+         //   formdata.length--;
 
             formdata.push({
                 name: "type",
@@ -24,7 +24,7 @@ object = {
 
             $('#sendEmailButton').html('<span class=\"spinner-grow spinner-grow-sm text-success\" role=\"status\" aria-hidden=\"true\"></span>Sending...<span class=\"spinner-grow spinner-grow-sm text-success\" role=\"status\" aria-hidden=\"true\"></span>')
 
-
+            console.log('TEST', apiObj);
             postApi('/mailer', apiObj, 'mailer');
 
         } else {

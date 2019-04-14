@@ -40,13 +40,14 @@ emailExistence.check = promisify(emailExistence.check);
 
 var pathSet = '/';
 router.route(pathSet).post(async (req, res) => {
+
     let verifiedEmail = {};
     let emailExists;
     let error = {};
     let profanity = (swearjar.profane(req.body.email) || swearjar.profane(req.body.message) || swearjar.profane(req.body.name));
-    if (!profanity) emailExists = await emailExistence.check(req.body.email).catch(e => console.log(e));
+    // if (!profanity) emailExists = await emailExistence.check(req.body.email).catch(e => console.log(e));
     console.log(emailExists)
-    if(emailExists)
+    if(emailExists) {
     verifiedEmail = await verifier.verify(req.body.email).catch(e => e);
     verifiedEmail.smtpCheck = (verifiedEmail.smtpCheck === 'true');
     verifiedEmail.formatCheck = (verifiedEmail.formatCheck === 'true');
@@ -150,6 +151,8 @@ router.route(pathSet).post(async (req, res) => {
         error.profanity = profanity;
     }
 
+}
+
     if (error.err) {
 
         return res.status(401).send({
@@ -166,4 +169,4 @@ router.route(pathSet).post(async (req, res) => {
 
 });
 
-server.use('/mailer', router);
+server.use('/mailer', server.recaptcha(), router);
