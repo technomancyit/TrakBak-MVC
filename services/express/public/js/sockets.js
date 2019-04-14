@@ -1,4 +1,24 @@
 var socket = io("http://192.168.0.216:1337");
+  let apiPostCategories = (data) => {
+    socket.emit('apiPostCategories', data);
+  console.log("RAN");
+  }
+  
+  let apiGetCategories = (data) => {
+    socket.emit('apiGetCategories', data);
+  console.log("RAN");
+  }
+  
+  let apiPutCategories = (data) => {
+    socket.emit('apiPutCategories', data);
+  console.log("RAN");
+  }
+  
+  let apiDeleteCategories = (data) => {
+    socket.emit('apiDeleteCategories', data);
+  console.log("RAN");
+  }
+  
   let apiPostGroups = (data) => {
     socket.emit('apiPostGroups', data);
   console.log("RAN");
@@ -89,29 +109,3 @@ var socket = io("http://192.168.0.216:1337");
   console.log("RAN");
   }
   
-  let apiPutUsers = (data) => {
-    socket.emit('apiPutUsers', data);
-  console.log("RAN");
-  }
-  
-  let apiDeleteUsers = (data) => {
-    socket.emit('apiDeleteUsers', data);
-  console.log("RAN");
-  }
-  
-socket.on('connected', function (data) {
-   console.log('Welcome to my portfolio.');
- });
-
-// Don't Edit above this line -->
-
-var dude = "test";
-
-
-var dude = "test";
-
-
-
-
-var dude = "test";
-

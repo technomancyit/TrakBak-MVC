@@ -125,15 +125,6 @@ async function asyncRoute() {
                         if (Object.keys(options).length !== 0) query = Object.assign(
                             query, options);
 
-                        switch (crud[i]) {
-                            case 'm_create':
-
-                                break;
-
-                            default:
-                                break;
-                        }
-
                         await Functions.asyncForEach(Object.keys(query.query), async (key) => {
 
                             var popSearch = key.split('.');
@@ -161,11 +152,7 @@ async function asyncRoute() {
                                 },
                                     pOptions);
 
-                                let lookup = await models[ref].m_read(
-                                    combine
-                                ).catch(e => console.log(e));
-
-
+                                let lookup = await models[ref].m_read(combine).catch(e => console.log(e));
                                 //   console.log('SR', lookup)
                                 if (lookup && !Array.isArray(lookup) || Array.isArray(lookup) && lookup.length !== 0) {
                                     delete query.query[key];
@@ -200,6 +187,7 @@ async function asyncRoute() {
 
                         });
 
+             
                         let data = await models[filename][crud[i]](query).catch(e => console.log(e));
                         if (data && data.collectionSize) {
 
@@ -264,8 +252,8 @@ async function asyncRoute() {
 
             }
 
-            if(options.socket !== false && options.routes[crud[i]].socket === undefined || options.routes[crud[i]].socket && options.routes[crud[i]].socket !== false) {
-                if(index === modelFiles.length - 1 && i === 3) {
+            if (options.socket !== false && options.routes[crud[i]].socket === undefined || options.routes[crud[i]].socket && options.routes[crud[i]].socket !== false) {
+                if (index === modelFiles.length - 1 && i === 3) {
                     options.last = true;
                 }
                 await socketRoutes(types[i], filename, options);

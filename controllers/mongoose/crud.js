@@ -125,7 +125,7 @@ module.exports = {
     return async (options, _cb) => {
 
       let populate = '';
-      if (options.populate && options.populate !== 'false') {
+      if (options && options.populate && options.populate !== 'false') {
         populate = options.populate;
 
         delete options.populate;
@@ -243,7 +243,8 @@ module.exports = {
 
       if (!_cb) {
         return new Promise((resolve, reject) => {
-          eval(model)[options.type](options.query)
+          console.log('fuck', options.type, options.query)
+          model[options.type](options.query)
             .skip(Number(options.perPage * options.page))
             .limit(Number(options.perPage))
             .sort({
@@ -352,6 +353,8 @@ module.exports = {
 
   m_delete: (model) => {
     return (options, _cb) => {
+      console.log('WHY DELERTE');
+      if(typeof options === 'string') options = {where:options};
       if (options.where || options.body) options.query = options.where ? options.where : options.body;
       if (!options.type) options.type = 'deleteOne';
       if (!_cb) {

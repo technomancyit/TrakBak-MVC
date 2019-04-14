@@ -4,6 +4,8 @@ const fs = require('fs'),
   socketJS = path.join(dir, '../express/js/sockets.js'),
   camelCase = require('camelcase'),
   socketsFile = fs.readFileSync(socketJS, 'utf8'),
+  crud = {post:'m_create', get:'m_read', put:'m_update', delete:'m_delete'},
+  models = require('mongoose').models
   customContent = socketsFile.replace(/(.|[\r\n])+\/\/ Don\'t Edit above this line -->/igm, ''),
   contents = `var socket = io(${config.express.socket ? `"${config.express.socket}"` : config.express.hostname ? `"${config.express.hostname}"` : `"socket.io"`});`,
   clientScripts = fs.readdirSync(`${dir}/clientScripts`);
@@ -14,10 +16,15 @@ let firstRun = false,
 async function currentSocketScript(type, name, prefix, socketJS) {
 
   let newName = camelCase(`${prefix}-${type}-${name}`);
+  // models[filename][crud[i]](query)
 
+  console.log(await models.Categories.m_read({query:{}}));
   connectionListener += `
-    socket.on("${newName}", (data) => {
-         console.log('FUCK', data)
+    socket.on("${newName}", async (data) => {
+  
+        console.log(data);
+        let model = await models.${name}.${crud[type]}(data)
+         console.log('FUCK', data, model)
        });`
 
   let scriptContent = `
@@ -35,16 +42,17 @@ async function asyncRead(type, name, options) {
     firstRun = true;
 
     await fs.writeFileSync(socketJS, `${contents}`)
-    currentSocketScript(type, name, options.prefix, socketJS);
+    await currentSocketScript(type, name, options.prefix, socketJS);
   }
   else if (options.last) {
 
     _sockets.io.prependListener('connection', (socket) => {
+      console.log(connectionListener)
       eval(connectionListener);
 
     });
 
-    currentSocketScript(type, name, options.prefix, socketJS);
+    await currentSocketScript(type, name, options.prefix, socketJS);
     if (clientScripts.length !== 0) await Functions.asyncForEach(clientScripts, async (script) => {
       let scriptContent = await fs.readFileSync(`${dir}/clientScripts/${script}`, 'utf8');
       scriptContent
@@ -53,7 +61,7 @@ async function asyncRead(type, name, options) {
 
     await fs.appendFileSync(socketJS, `\n\n// Don't Edit above this line -->${customContent}`)
   } else {
-    currentSocketScript(type, name, options.prefix, socketJS);
+    await currentSocketScript(type, name, options.prefix, socketJS);
   }
 
 }
