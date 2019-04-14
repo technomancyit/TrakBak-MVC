@@ -18,7 +18,6 @@ async function currentSocketScript(type, name, prefix, socketJS) {
   let newName = camelCase(`${prefix}-${type}-${name}`);
   // models[filename][crud[i]](query)
 
-  console.log(await models.Categories.m_read({query:{}}));
   connectionListener += `
     socket.on("${newName}", async (data) => {
   
@@ -47,7 +46,7 @@ async function asyncRead(type, name, options) {
   else if (options.last) {
 
     _sockets.io.prependListener('connection', (socket) => {
-      console.log(connectionListener)
+
       eval(connectionListener);
 
     });

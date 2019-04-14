@@ -11,11 +11,16 @@ module.exports = (permissions) => {
         if (req.routeAccess) return next();
         let compareArray = Functions.permissionArray(permissions);
 
-        console.log(compareArray, JSON.parse(req.user).permissions);
+        
+        let user = JSON.parse(req.user)
+        let binaryArray = Functions.permissionArray(user.permissions);
+        await Functions.asyncForEach(user.groups, (group) => {
+            binaryArray = Object.assign(binaryArray, Functions.permissionArray(appGroups[group]));
+        })
 
-        let binaryArray = Functions.permissionArray(JSON.parse(req.user).permissions);
         let found = false;
 
+        console.log(binaryArray)
         await Functions.asyncForEach(Object.keys(compareArray), (key) => {
             if (binaryArray[key]) found = true;
         });

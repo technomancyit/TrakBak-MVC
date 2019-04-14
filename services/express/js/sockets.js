@@ -125,5 +125,3 @@ socket.on('connected', function (data) {
 
 // Don't Edit above this line -->
 
-
-var fuck = 'fuck you';

@@ -19,7 +19,15 @@ if (config.mongoUser) {
 async function awaitMongoose() {
     let connected = await mongoose.connect(mongooseConnect, { auth, useNewUrlParser: true }).catch(e => log('mongoose-error', [e.toString()]));
     if (connected) log('mongoose-connected', [config.mongo.host, msgString]);
+    let groups = await require('../../apiModels/Groups').Groups.m_read({query:{}});
+    let groupObj = {};
+    await Functions.asyncForEach(groups, async (group) => {
+        groupObj[group._id] = group.permissions;
+    });
+
+    global.appGroups = groupObj;
 }
 awaitMongoose();
 
-require('../../apiModels/Users');
+//require('../../apiModels/Users');
+

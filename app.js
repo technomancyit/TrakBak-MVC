@@ -9,7 +9,7 @@ global.config = require('./config/scripts/config');
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
 
 
-Promise.all(require('./config/scripts/config').doneArray).then((data) => {
+Promise.all(require('./config/scripts/config').doneArray).then(async (data) => {
     
     global.config.bash = data[0];
     global.config.mail = data[2];
@@ -26,6 +26,10 @@ Promise.all(require('./config/scripts/config').doneArray).then((data) => {
     require('./controllers/mongoose/mongoose');
     require('./services/express/server');
     require('./services/express/routes/mongooseAutomationRoutes');
+    
+    //set up global groups. This helps for caching all groups.
+
+   
 
     let job = new CronJob('*/10 * * * * *', function () {
         imap({

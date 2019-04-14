@@ -3,6 +3,9 @@
 const mongoose = require('mongoose'),
     mailer = require('../mail/mailer'),
     Notifications = mongoose.models.Notifications;
+
+
+
 class Notification {
 
     constructor(doc, text, options) {
@@ -90,7 +93,7 @@ class Notification {
         }));
 
     }
-    
+
     schedule() {
 
     }
@@ -105,6 +108,7 @@ class Notification {
         if (this.notifications) return this.notifications
 
         //layer one is global notifications. after this information will be used to look for user notiifcaitons that will overide these.
+      
         let layerOne = await Notifications.m_read({
             query: {
                 type: 0,

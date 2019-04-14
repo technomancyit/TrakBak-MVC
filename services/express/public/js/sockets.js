@@ -109,3 +109,19 @@ var socket = io("http://192.168.0.216:1337");
   console.log("RAN");
   }
   
+  let apiPutUsers = (data) => {
+    socket.emit('apiPutUsers', data);
+  console.log("RAN");
+  }
+  
+  let apiDeleteUsers = (data) => {
+    socket.emit('apiDeleteUsers', data);
+  console.log("RAN");
+  }
+  
+socket.on('connected', function (data) {
+   console.log('Welcome to my portfolio.');
+ });
+
+// Don't Edit above this line -->
+
