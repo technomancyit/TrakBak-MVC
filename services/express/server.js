@@ -29,7 +29,6 @@ app.permissions = require('./middleware/permissions');
 app.groups = require('./middleware/groups');
 app.policy = require('./middleware/loadPolicies');
 
-
 //sockets.connect();
 sockets.socketRoute('connect');
 sockets.socketRoute('disconnect');
@@ -47,8 +46,6 @@ app.use(express.static(dir + '/public'));
 
 //load user vue script (This will add recaptcha to vue if its in config)
 
-
-
 fs.readFile = promisify(fs.readFile);
 
 var checkVue = fs.readdirSync(dir + '/vue');
@@ -56,9 +53,6 @@ var vueFiles = [];
 let push = {};
 let firstRun = {}
 let myContents = {}
-
-
-
 
 async function recaptchSiteKey(contents) {
     return contents.replace('recaptchSiteKey: recaptchSiteKey', `recaptchSiteKey: "${config.express.recaptchSiteKey}"`);
@@ -111,8 +105,6 @@ Functions.asyncForEach(checkVue, async (vueFile, index) => {
                 var directory = file.substring(0, file.length - 3);
                 if (!firstRun[directory]) firstRun[directory] = true;
                 let first = false;
-
-
                 var files = fs.readdirSync(`${dir}/vue/data/${directory}`, 'utf8');
 
                 push[directory] = {
@@ -120,7 +112,6 @@ Functions.asyncForEach(checkVue, async (vueFile, index) => {
                     methods: '',
                 }
                 if (files.length > 0) vueUpdate(files, directory, 'data');
-
 
                 var files = fs.readdirSync(`${dir}/vue/methods/${directory}`, 'utf8');
 
@@ -145,11 +136,11 @@ async function socketLoad() {
     await sockets.socketOn('leaveRoom');
     await sockets.socketOn('socketPush');
     await sockets.socketOn('sendInfo', {});
-    await sockets.socketOn('test', {subname:'get'});
-    if(sockets.socketRoutesStream) {
+    await sockets.socketOn('test', { subname: 'get' });
+    if (sockets.socketRoutesStream) {
         sockets.streamClose();
     }
-    
+
 }
 
 socketLoad();
@@ -160,14 +151,11 @@ http.listen(config.express.port, () => {
     log('express-started', [ip.address(), config.express.port]);
 });
 
+module.exports = { app, sockets };
 
-
-module.exports = {app, sockets};
-
-
-setTimeout(function(){ 
+setTimeout(function () {
     console.log(sockets.socketClients);
-    let index  = reqReload('./routes/index');
-    app[index.type](index.path+'1/', index.route);
-     
+    let index = reqReload('./routes/index');
+    app[index.type](index.path + '1/', index.route);
+
 }, 3000);

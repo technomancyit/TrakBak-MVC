@@ -7,15 +7,12 @@ var pathSet = '/';
 let page = '/';
 let models = {};
 
-
-
 module.exports = {
     route: (req, res) => {
         res.render(page, { title: 'title' });
     },
     path: pathSet
 }
-
 
 require('../apiRoutes/bashBuffer');
 

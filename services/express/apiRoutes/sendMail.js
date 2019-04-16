@@ -23,8 +23,6 @@ const express = require('express'),
     router = express.Router()
 const Notification = require('../../notifications/userNotification');
 
-
-
 let verifier = new Verifier("at_VLZKJ87dDSp9lQEGjMGPzW71bh4f8");
 
 let hostname;
@@ -33,7 +31,6 @@ if (config.express.port) {
 } else {
     hostname = config.express.hostname;
 }
-
 
 verifier.verify = promisify(verifier.verify);
 emailExistence.check = promisify(emailExistence.check);
@@ -167,7 +164,5 @@ router.route(pathSet).post(async (req, res) => {
     return res.status(200).send(JSON.stringify({}));
 
 });
-
-
 
 server.use('/mailer', server.policy(true), router);

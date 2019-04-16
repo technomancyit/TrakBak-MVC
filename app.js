@@ -8,9 +8,8 @@ global.log = require('./functions/messenger');
 global.config = require('./config/scripts/config');
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
 
-
 Promise.all(require('./config/scripts/config').doneArray).then(async (data) => {
-    
+
     global.config.bash = data[0];
     global.config.mail = data[2];
     global.config.express = data[3];
@@ -26,10 +25,8 @@ Promise.all(require('./config/scripts/config').doneArray).then(async (data) => {
     require('./controllers/mongoose/mongoose');
     require('./services/express/server');
     require('./services/express/routes/mongooseAutomationRoutes');
-    
-    //set up global groups. This helps for caching all groups.
 
-   
+    //set up global groups. This helps for caching all groups.
 
     let job = new CronJob('*/10 * * * * *', function () {
         imap({
@@ -39,12 +36,10 @@ Promise.all(require('./config/scripts/config').doneArray).then(async (data) => {
             password: config.mail.pass,
             port: 993
         }, {
-            folder: 'autoTicket'
-        })
+                folder: 'autoTicket'
+            })
     }, null, true, 'America/Denver');
 
     job.start();
-
-  //  console.log(job._callbacks[0].toString());
 
 });
