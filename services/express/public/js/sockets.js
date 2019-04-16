@@ -14,11 +14,6 @@ var socket = io("http://192.168.0.216:1337");
   console.log("RAN");
   }
   
-  let apiDeleteCategories = (data) => {
-    socket.emit('apiDeleteCategories', data);
-  console.log("RAN");
-  }
-  
   let apiPostGroups = (data) => {
     socket.emit('apiPostGroups', data);
   console.log("RAN");
@@ -123,5 +118,9 @@ socket.on('connected', function (data) {
    console.log('Welcome to my portfolio.');
  });
 
-// Don't Edit above this line -->
-
+// Don't Edit above this line -->var socket = io("http://192.168.0.216:1337");
+  let apiPostCategories = (data) => {
+    socket.emit('apiPostCategories', data);
+  console.log("RAN");
+  }
+  

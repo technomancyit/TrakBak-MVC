@@ -19,8 +19,7 @@ module.exports = (permissions) => {
         })
 
         let found = false;
-
-        console.log(binaryArray)
+        
         await Functions.asyncForEach(Object.keys(compareArray), (key) => {
             if (binaryArray[key]) found = true;
         });

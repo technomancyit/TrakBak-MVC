@@ -1,0 +1,46 @@
+{
+	"prefix": "api",
+	"routes": {
+		"m_create": {
+			"api": false
+		},
+		"m_read": {},
+		"m_update": {
+			"permissions": 1
+		},
+		"m_delete": {
+			"permissions": 1,
+			"socket": false
+		}
+	},
+	"path": "/api/Categories",
+	"policies": {
+		"test2": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/test2.js",
+			"enabled": true,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		},
+		"test": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/test.js",
+			"enabled": true,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		},
+		"recaptcha": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/recaptcha.js",
+			"enabled": false,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		}
+	}
+}

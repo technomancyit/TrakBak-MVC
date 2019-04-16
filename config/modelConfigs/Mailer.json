@@ -1,0 +1,32 @@
+{
+	"path": "/mailer",
+	"policies": {
+		"test": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/test.js",
+			"enabled": true,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		},
+		"recaptcha": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/recaptcha.js",
+			"enabled": true,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		},
+		"test2": {
+			"routes": {},
+			"function": "/Users/chad/TrakBak-MVC/controllers/policies/test2.js",
+			"enabled": false,
+			"linked": {
+				"groups": {},
+				"permissions": {}
+			}
+		}
+	}
+}

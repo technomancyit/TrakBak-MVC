@@ -26,10 +26,12 @@ let models = mongoose.models,
 async function asyncRoute() {
 
     await Functions.asyncForEach(modelFiles, async (file, index) => {
+
         let filename = file.slice(0, file.length - 3);
         let model = require(`${apiModels}/${file}`);
         let options = {};
-        if (model) options = model.options;
+        if (model) options = await require(`${apiModels}/${file}`).options;
+
         options.path = options.prefix ? `/${options.prefix}/${filename}` : `/${filename}`;
 
         for (let i = 0; i < 4; i++) {
@@ -245,9 +247,10 @@ async function asyncRoute() {
                 });
                 rf.push(route);
                 if (authentication) {
-                    router.route(route.path)[route.type](authentication, server.permissions(permissions), route.route)
+                    console.log(route.path)
+                    router.route(route.path)[route.type](authentication, server.permissions(permissions), server.policy(true), route.route)
                 } else {
-                    router.route(route.path)[route.type](route.route);
+                    router.route(route.path)[route.type](server.policy(true), route.route);
                 }
 
             }

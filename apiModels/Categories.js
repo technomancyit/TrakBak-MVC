@@ -5,6 +5,8 @@ const mongoose = require('mongoose'),
     crud = require('../controllers/mongoose/crud'),
     bcrypt = require('bcrypt-nodejs');
 
+const modelConfig = require('../config/modelConfigs/Categories.json');
+
 var modelName = 'Categories';
 
 var schema = new mongoose.Schema({
@@ -31,7 +33,7 @@ var schema = new mongoose.Schema({
     },
     permissions: {
         type: Number,
-        default : 1
+        default: 1
     },
     createdAt: {
         type: Date,
@@ -57,23 +59,9 @@ let crudObj = {
 
 Model = Object.assign(Model, crudObj);
 
-const options = {
-    prefix: 'api',
-    routes: {
-        m_create: {
-            api: false
-        },
-        m_read: {
-           
-        },
-        m_update: {
-            permissions: 1
-        },
-        m_delete: {
-            permissions: 1
-        }
-    }
-}
+const options = new Promise((resolve, reject) => {
+    resolve(require('../config/modelConfigs/Categories.json'));
+});
 
 module.exports = {
     [modelName]: Model,
