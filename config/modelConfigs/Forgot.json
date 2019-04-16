@@ -1,24 +1,10 @@
 {
-	"prefix": "api",
-	"routes": {
-		"m_create": {
-			"api": false
-		},
-		"m_read": {},
-		"m_update": {
-			"permissions": 1
-		},
-		"m_delete": {
-			"permissions": 1,
-			"socket": false
-		}
-	},
-	"path": "/api/Categories",
+	"path": "/forgot/auth",
 	"policies": {
 		"recaptcha": {
 			"routes": {},
 			"function": "/Users/chad/TrakBak-MVC/controllers/policies/recaptcha.js",
-			"enabled": false,
+			"enabled": true,
 			"linked": {
 				"groups": {},
 				"permissions": {}

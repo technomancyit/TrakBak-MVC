@@ -25,7 +25,6 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-app.recaptcha = require('./middleware/googleRecaptcha');
 app.permissions = require('./middleware/permissions');
 app.groups = require('./middleware/groups');
 app.policy = require('./middleware/loadPolicies');

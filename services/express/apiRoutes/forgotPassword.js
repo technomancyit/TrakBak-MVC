@@ -72,4 +72,4 @@ router.route('').post(async (req, res) => {
 
 });
 
-server.use(pathSet, server.recaptcha(), router);
+server.use(pathSet, server.policy(true), router);
